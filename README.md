@@ -95,30 +95,30 @@ conmutaciones: el objeto viejo sigue válido (I5) y el estado nunca se movió
 
 ## El demo completo, de punta a punta (guion para grabar)
 
-Tres comandos, cada uno mostrando una pieza distinta del mismo mecanismo —
-protocolo, máquina, y la verificación de linaje:
+**A propósito, esto no es un recorrido de código.** El video muestra el
+mecanismo pasando, no pruebas de que el código compila — por eso
+`verificar.py` (la suite de tests) queda afuera de la grabación: es
+evidencia para quien lea el repo, no el producto en acción. Lo que sí es
+"producto corriendo": un nodo llegando a un trigger real y cambiando sus
+propias reglas frente a la cámara, y la primitiva sucesora ejecutando de
+verdad, no un benchmark.
 
 ```
-python verificar.py -v                        # 1. las 81 pruebas de Fase 0-1, nombradas
-python herramientas/demo.py                    # 2. la conmutación corriendo y Verify() = True
-cd predicado/vm && cargo run --release --bin bloque   # 3. la sucesora corriendo como bytecode, bajo presupuesto
+python herramientas/demo.py                          # 1. la conmutación corriendo y Verify() = True
+cd predicado/vm && cargo run --release --bin bloque   # 2. la sucesora corriendo como bytecode, bajo presupuesto
 ```
 
-**Qué decir en cada paso:**
+**Estructura de ~3 minutos:**
 
-1. *Las invariantes no son comentarios.* 81 criterios ejecutables, cinco
-   invariantes (I1–I5), corridos contra el motor de sucesión real — no
-   pseudocódigo.
-2. *El mecanismo central del paper, corriendo.* Un canario criptográfico
-   real (ML-DSA-44) se gasta, dispara la sucesora (ML-DSA-87), el nodo
-   conmuta su propio ruleset sin mover el estado, y `Verify()` confirma la
-   cadena de linaje desde el génesis. Señalar la línea `recibo-1 nació en la
-   generación 0` — sigue siendo válido después de dos conmutaciones.
-3. *La sucesora no es un anuncio, es código que corre.* La primitiva nueva
-   se ejecuta como bytecode en un intérprete RV32IM sin dependencias, bajo
-   presupuesto de pasos **y** de páginas de memoria — dos techos de
-   consenso, no uno. Señalar `C1 APROBADO` y el margen contra los 1500 ms
-   del bloque.
+| tiempo | pantalla | qué decir |
+|---|---|---|
+| 0:00–0:20 | terminal vacía, sin código en pantalla | el problema, en una frase: toda cadena termina necesitando un fork coordinado por humanos — Geminis no |
+| 0:20–1:30 | `herramientas/demo.py` corriendo en vivo | señalar en tiempo real: el canario ML-DSA-44 se gasta, dispara la sucesora, el nodo conmuta sin mover el estado, y pausar en `Verify(checkpoints, H0_GENESIS) = True` |
+| 1:30–2:30 | `cargo run --bin bloque` corriendo en vivo | la primitiva sucesora (ML-DSA-87) ejecutando como bytecode real, bajo presupuesto de pasos y páginas — no es una métrica, es lo que pasa después del switch de arriba |
+| 2:30–3:00 | el repo en GitHub (README, no código) + link | por qué importa, y que todo lo mostrado es reproducible por cualquiera |
+
+Ambos pasos son el mismo hilo narrativo (un switch, y lo que corre después
+de él) — no dos features sueltas.
 
 ## Qué se declara en el submission
 
