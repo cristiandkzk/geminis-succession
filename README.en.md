@@ -10,6 +10,10 @@ cryptographic primitive that signs it — without a human fork, verifiable by
 anyone. The full design lives in the Geminis paper; this repo holds only the
 minimal mechanism, running.
 
+**Live demo (nothing to clone):** [geminis-succession-ihy4.vercel.app](https://geminis-succession-ihy4.vercel.app/)
+— a real run visualized, and a panel to break the lineage and watch
+`Verify()` flip from `True` to `False`.
+
 ```
 python verificar.py       # the 81 tests in this slice
 python verificar.py -v    # with each criterion's name
@@ -102,9 +106,18 @@ stays readable after two switches: the old object is still valid (I5) and
 state never moved (I3) — it's the same `id(nodo.estado)` start to finish.
 
 **To see that same run at a glance** (not an illustration: it's the real
-data that run produced), open [`docs/timeline.html`](docs/timeline.html) in
-a browser — a static file, no server, no dependencies. Regenerate it with
+data that run produced):
+[geminis-succession-ihy4.vercel.app/timeline.html](https://geminis-succession-ihy4.vercel.app/timeline.html)
+— or open [`docs/timeline.html`](docs/timeline.html) locally, a static
+file, no server, no dependencies. Regenerate it with
 `python docs/capturar_datos.py`.
+
+**And to see what happens if someone tampers with the chain**, without
+taking anyone's word for it:
+[geminis-succession-ihy4.vercel.app/verify.html](https://geminis-succession-ihy4.vercel.app/verify.html)
+— nine real ways to break `Verify()`, computed by running
+`docs/capturar_verify_demo.py` (the same scenarios as
+`pruebas/test_linaje.py`), not simulated in the browser.
 
 ## What's declared in the submission
 

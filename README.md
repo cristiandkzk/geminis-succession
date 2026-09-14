@@ -10,6 +10,10 @@ primitiva criptográfica que la firma— sin fork humano, verificable por
 cualquiera. El diseño completo está en el paper del repo Geminis; acá vive
 sólo el mecanismo mínimo, corriendo.
 
+**Demo en vivo (sin clonar nada):** [geminis-succession-ihy4.vercel.app](https://geminis-succession-ihy4.vercel.app/)
+— una corrida real visualizada, y un panel para romper el linaje y ver
+`Verify()` pasar de `True` a `False`.
+
 ```
 python verificar.py       # las 81 pruebas de este recorte
 python verificar.py -v    # con el nombre de cada criterio
@@ -102,10 +106,18 @@ conmutaciones: el objeto viejo sigue válido (I5) y el estado nunca se movió
 (I3) — es el mismo `id(nodo.estado)` de punta a punta.
 
 **Para ver esa misma corrida de un vistazo** (no una ilustración: son los
-datos reales que produjo la corrida de arriba), abrí
-[`docs/timeline.html`](docs/timeline.html) en el navegador — es un archivo
+datos reales que produjo la corrida de arriba):
+[geminis-succession-ihy4.vercel.app/timeline.html](https://geminis-succession-ihy4.vercel.app/timeline.html)
+— o abrí [`docs/timeline.html`](docs/timeline.html) local, es un archivo
 estático, sin servidor ni dependencias. Se regenera con
 `python docs/capturar_datos.py`.
+
+**Y para ver que pasa si alguien manipula la cadena**, sin confiar en la
+palabra de nadie:
+[geminis-succession-ihy4.vercel.app/verify.html](https://geminis-succession-ihy4.vercel.app/verify.html)
+— nueve formas reales de romper `Verify()`, calculadas corriendo
+`docs/capturar_verify_demo.py` (los mismos escenarios que
+`pruebas/test_linaje.py`), no simuladas en el navegador.
 
 ## Qué se declara en el submission
 
