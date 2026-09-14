@@ -101,6 +101,11 @@ assertion hidden inside a test. Above that, the line
 stays readable after two switches: the old object is still valid (I5) and
 state never moved (I3) — it's the same `id(nodo.estado)` start to finish.
 
+**To see that same run at a glance** (not an illustration: it's the real
+data that run produced), open [`docs/timeline.html`](docs/timeline.html) in
+a browser — a static file, no server, no dependencies. Regenerate it with
+`python docs/capturar_datos.py`.
+
 ## What's declared in the submission
 
 **Pre-existing** (outside the 9/14–10/12 hackathon window, declared as

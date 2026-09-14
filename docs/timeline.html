@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Geminis · una corrida real</title>
+<style>
+  :root {
+    --ground: #F6F8F8; --surface: #FFFFFF; --surface-alt: #EEF2F2;
+    --ink: #12181A; --ink-soft: #3D4A4D; --ink-mute: #6B797C;
+    --rule: #D9E0E1; --rule-soft: #E8EDED;
+    --accent: #0B6B68; --accent-soft: #E0EFEE;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #0D1214; --surface: #141B1D; --surface-alt: #1A2325;
+      --ink: #E3E9E9; --ink-soft: #B4C0C1; --ink-mute: #859294;
+      --rule: #253032; --rule-soft: #1C2527;
+      --accent: #4EC6BE; --accent-soft: #16302F;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--ground); color: var(--ink); font-family: var(--mono);
+    margin: 0; padding: 2rem 1.5rem 4rem; font-size: 14px; line-height: 1.6;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.15rem; font-weight: 600; margin: 0 0 .3rem; }
+  .sub { color: var(--ink-mute); font-size: .85rem; margin: 0 0 2rem; }
+  .card {
+    background: var(--surface); border: 1px solid var(--rule);
+    padding: 1.4rem 1.5rem; margin-bottom: 1.5rem; overflow-x: auto;
+  }
+  .card h2 {
+    font-size: .78rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 1.1rem; font-weight: 600;
+  }
+  svg text { font-family: var(--mono); }
+  .lane-label { font-size: 10.5px; fill: var(--ink-mute); }
+  .h-label { font-size: 9.5px; fill: var(--ink-mute); }
+  .h-label-strong { font-size: 9.5px; fill: var(--ink); font-weight: 600; }
+  .rule-line { stroke: var(--rule); stroke-width: 1; }
+  .axis-line { stroke: var(--ink-mute); stroke-width: 1; }
+  .bar-wait { fill: var(--surface-alt); stroke: var(--rule); }
+  .bar-inflight { fill: var(--accent-soft); stroke: var(--accent); }
+  .bar-inflight-mute { fill: var(--surface-alt); stroke: var(--ink-mute); }
+  .marker-activate { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 3 3; }
+  .chain-box { fill: var(--surface-alt); stroke: var(--rule); }
+  .chain-box-accent { fill: var(--accent-soft); stroke: var(--accent); }
+  .chain-hex { font-size: 10px; fill: var(--ink); }
+  .chain-hex-mute { font-size: 10px; fill: var(--ink-mute); }
+  .chain-arrow { stroke: var(--ink-mute); stroke-width: 1; fill: none; }
+  .verify-ok {
+    display: inline-flex; align-items: center; gap: .5rem;
+    color: var(--accent); font-weight: 600; font-size: .95rem;
+    margin-top: 1rem;
+  }
+  .verify-ok .dot {
+    width: .6rem; height: .6rem; border-radius: 50%; background: var(--accent);
+    display: inline-block;
+  }
+  .foot {
+    color: var(--ink-mute); font-size: .82rem; margin-top: .6rem;
+    border-top: 1px solid var(--rule-soft); padding-top: .8rem;
+  }
+  .foot b { color: var(--ink); }
+  .note {
+    color: var(--ink-mute); font-size: .82rem; margin: 0 0 1.5rem;
+    border-left: 2px solid var(--accent); padding-left: .9rem;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Geminis — una corrida real, no una ilustración</h1>
+  <p class="sub">Datos capturados ejecutando <code>docs/capturar_datos.py</code>, el mismo
+    escenario que <code>herramientas/demo.py</code>. Nada de esto es inventado: son las
+    alturas y los hashes que produjo esa corrida.</p>
+
+  <p class="note">Regenerar con <code>python docs/capturar_datos.py</code> y volver a abrir
+    este archivo — lee <code>timeline-data.json</code> inline, no hace falta servidor.</p>
+
+  <div class="card">
+    <h2>Línea de tiempo — tres generaciones, dos superpuestas</h2>
+    <svg id="timeline" width="860" height="245" viewBox="0 0 860 245"></svg>
+  </div>
+
+  <div class="card">
+    <h2>Verify(checkpoints, H0_GENESIS) — la cadena de linaje</h2>
+    <svg id="chain" width="860" height="120" viewBox="0 0 860 120"></svg>
+    <div id="verify"></div>
+  </div>
+
+  <div class="card">
+    <h2>Estado después de la corrida</h2>
+    <div id="resumen" class="foot"></div>
+  </div>
+</div>
+
+<script type="application/json" id="data">
+{
+  "bloques": 262,
+  "ventana_finalidad": 12,
+  "altura_canario": 130,
+  "h0_genesis": "dd2ce1fe33cbcad03581aa8db7d3ed9066774899996d8e708086e960ce0af19d",
+  "checkpoints": [
+    {
+      "generacion": 1,
+      "clase": "circulacion",
+      "regla": "emision/mitad",
+      "altura_disparo": 100,
+      "altura_lockin": 112,
+      "altura_activacion": 176,
+      "delta": 64,
+      "h0": "10dc54204513e4b603a1b4c274324b3ccf1ca369902dc5f99c3eff7cafc2df42",
+      "h0_ancestro": "dd2ce1fe33cbcad03581aa8db7d3ed9066774899996d8e708086e960ce0af19d"
+    },
+    {
+      "generacion": 2,
+      "clase": "criptografica",
+      "regla": "cripto/canario",
+      "altura_disparo": 130,
+      "altura_lockin": 142,
+      "altura_activacion": 176,
+      "delta": 8,
+      "h0": "d6a8448d1908ab413973e012c60571a4e06a0f6fa86c4d60ada03c17fd02a5f3",
+      "h0_ancestro": "10dc54204513e4b603a1b4c274324b3ccf1ca369902dc5f99c3eff7cafc2df42"
+    },
+    {
+      "generacion": 3,
+      "clase": "circulacion",
+      "regla": "emision/mitad",
+      "altura_disparo": 225,
+      "altura_lockin": 237,
+      "altura_activacion": 301,
+      "delta": 64,
+      "h0": "d07a863f811ac9e3b3aadfbed53193fc65ab034851e89b44b10cfe3e888865e9",
+      "h0_ancestro": "d6a8448d1908ab413973e012c60571a4e06a0f6fa86c4d60ada03c17fd02a5f3"
+    }
+  ],
+  "conmutaciones": [
+    { "altura": 176, "generacion": 1 },
+    { "altura": 176, "generacion": 2 }
+  ],
+  "verify_ok": true,
+  "resumen": {
+    "altura_final": 262,
+    "generacion_final": 2,
+    "arranques": 1,
+    "alice": 400,
+    "recibo1_generacion": 0
+  }
+}
+</script>
+
+<script>
+const data = JSON.parse(document.getElementById('data').textContent);
+
+// ---------- timeline ----------
+(function () {
+  const svg = document.getElementById('timeline');
+  const W = 860, AXIS_Y = 210;
+  const marginL = 40, marginR = 20;
+  const maxH = Math.max(...data.checkpoints.map(c => c.altura_activacion)) + 15;
+  const x = h => marginL + (h / maxH) * (W - marginL - marginR);
+
+  const ns = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, text) {
+    const e = document.createElementNS(ns, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  // axis
+  el('line', { x1: x(0), y1: AXIS_Y, x2: x(maxH), y2: AXIS_Y, class: 'axis-line' });
+  [0, data.altura_canario, ...data.checkpoints.flatMap(c => [c.altura_disparo, c.altura_lockin, c.altura_activacion])]
+    .filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => a - b)
+    .forEach(h => {
+      el('line', { x1: x(h), y1: AXIS_Y - 5, x2: x(h), y2: AXIS_Y + 5, class: 'rule-line' });
+      el('text', { x: x(h), y: AXIS_Y + 18, class: 'h-label', 'text-anchor': 'middle' }, h);
+    });
+
+  // one lane per checkpoint
+  data.checkpoints.forEach((c, i) => {
+    const y = 40 + i * 60;
+    const cls = c.clase === 'criptografica' ? 'bar-inflight' : 'bar-inflight-mute';
+    el('text', { x: marginL, y: y - 10, class: 'lane-label' },
+      `gen ${c.generacion} · ${c.regla} (${c.clase}, Δ=${c.delta})`);
+    // disparo -> lockin: waiting
+    el('rect', { x: x(c.altura_disparo), y, width: x(c.altura_lockin) - x(c.altura_disparo), height: 16, class: 'bar-wait' });
+    // lockin -> activacion: in flight (committed, not yet active)
+    el('rect', { x: x(c.altura_lockin), y, width: x(c.altura_activacion) - x(c.altura_lockin), height: 16, class: cls });
+    // markers — "lock-in" staggered lower so it doesn't collide with "disparo"
+    // when the two are only a few blocks apart (e.g. the canary: 130 -> 142)
+    [['disparo', c.altura_disparo, 30], ['lock-in', c.altura_lockin, 42], ['activa', c.altura_activacion, 30]]
+      .forEach(([label, h, dy]) => {
+        el('line', { x1: x(h), y1: y - 4, x2: x(h), y2: y + 20, class: 'marker-activate' });
+        el('text', { x: x(h), y: y + dy, class: 'h-label', 'text-anchor': 'middle' }, label);
+      });
+  });
+
+  el('text', { x: marginL, y: 14, class: 'h-label-strong' }, 'altura de bloque →');
+})();
+
+// ---------- lineage chain ----------
+(function () {
+  const svg = document.getElementById('chain');
+  const ns = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, text) {
+    const e = document.createElementNS(ns, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+  const nodes = [
+    { label: 'GENESIS', hex: data.h0_genesis },
+    ...data.checkpoints.map(c => ({ label: `gen ${c.generacion} (${c.regla})`, hex: c.h0 })),
+  ];
+  const boxW = 195, gap = 20, startX = 15, y = 30;
+  nodes.forEach((n, i) => {
+    const cx = startX + i * (boxW + gap);
+    el('rect', { x: cx, y, width: boxW, height: 46, class: i === 0 ? 'chain-box' : 'chain-box-accent', rx: 2 });
+    el('text', { x: cx + 10, y: y + 18, class: 'chain-hex-mute' }, n.label);
+    el('text', { x: cx + 10, y: y + 36, class: 'chain-hex' }, 'H0 = ' + n.hex.slice(0, 14) + '…');
+    if (i > 0) {
+      el('path', { d: `M ${cx - gap + 2} ${y + 23} L ${cx - 4} ${y + 23}`, class: 'chain-arrow', 'marker-end': 'url(#arrow)' });
+    }
+  });
+  const defs = el('defs', {});
+  const marker = document.createElementNS(ns, 'marker');
+  marker.setAttribute('id', 'arrow'); marker.setAttribute('markerWidth', '6');
+  marker.setAttribute('markerHeight', '6'); marker.setAttribute('refX', '5'); marker.setAttribute('refY', '3');
+  marker.setAttribute('orient', 'auto');
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('d', 'M0,0 L6,3 L0,6 Z');
+  path.setAttribute('fill', 'var(--ink-mute)');
+  marker.appendChild(path); defs.appendChild(marker);
+
+  document.getElementById('verify').innerHTML = data.verify_ok
+    ? `<div class="verify-ok"><span class="dot"></span> Verify(checkpoints, H0_GENESIS) = True — ${data.checkpoints.length} generaciones encadenadas, verificado desde génesis</div>`
+    : `<div class="verify-ok" style="color:#8F452A"><span class="dot" style="background:#8F452A"></span> Verify(...) = False</div>`;
+})();
+
+// ---------- summary ----------
+(function () {
+  const r = data.resumen;
+  document.getElementById('resumen').innerHTML =
+    `altura final <b>${r.altura_final}</b> · generación activa <b>${r.generacion_final}</b> · ` +
+    `arranques <b>${r.arranques}</b> (mismo proceso, mismo estado) · ` +
+    `alice = <b>${r.alice}</b> · recibo-1 nació en generación <b>${r.recibo1_generacion}</b> y ` +
+    `sigue siendo legible después de ${data.checkpoints.length} conmutaciones (I5).`;
+})();
+</script>
+</body>
+</html>

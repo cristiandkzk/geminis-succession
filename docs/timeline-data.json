@@ -1,0 +1,59 @@
+{
+  "bloques": 262,
+  "ventana_finalidad": 12,
+  "altura_canario": 130,
+  "h0_genesis": "dd2ce1fe33cbcad03581aa8db7d3ed9066774899996d8e708086e960ce0af19d",
+  "checkpoints": [
+    {
+      "generacion": 1,
+      "clase": "circulacion",
+      "regla": "emision/mitad",
+      "altura_disparo": 100,
+      "altura_lockin": 112,
+      "altura_activacion": 176,
+      "delta": 64,
+      "h0": "10dc54204513e4b603a1b4c274324b3ccf1ca369902dc5f99c3eff7cafc2df42",
+      "h0_ancestro": "dd2ce1fe33cbcad03581aa8db7d3ed9066774899996d8e708086e960ce0af19d"
+    },
+    {
+      "generacion": 2,
+      "clase": "criptografica",
+      "regla": "cripto/canario",
+      "altura_disparo": 130,
+      "altura_lockin": 142,
+      "altura_activacion": 176,
+      "delta": 8,
+      "h0": "d6a8448d1908ab413973e012c60571a4e06a0f6fa86c4d60ada03c17fd02a5f3",
+      "h0_ancestro": "10dc54204513e4b603a1b4c274324b3ccf1ca369902dc5f99c3eff7cafc2df42"
+    },
+    {
+      "generacion": 3,
+      "clase": "circulacion",
+      "regla": "emision/mitad",
+      "altura_disparo": 225,
+      "altura_lockin": 237,
+      "altura_activacion": 301,
+      "delta": 64,
+      "h0": "d07a863f811ac9e3b3aadfbed53193fc65ab034851e89b44b10cfe3e888865e9",
+      "h0_ancestro": "d6a8448d1908ab413973e012c60571a4e06a0f6fa86c4d60ada03c17fd02a5f3"
+    }
+  ],
+  "conmutaciones": [
+    {
+      "altura": 176,
+      "generacion": 1
+    },
+    {
+      "altura": 176,
+      "generacion": 2
+    }
+  ],
+  "verify_ok": true,
+  "resumen": {
+    "altura_final": 262,
+    "generacion_final": 2,
+    "arranques": 1,
+    "alice": 400,
+    "recibo1_generacion": 0
+  }
+}

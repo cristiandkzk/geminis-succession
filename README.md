@@ -101,6 +101,12 @@ paper, no una aserción escondida en un test. Arriba de eso, la línea
 conmutaciones: el objeto viejo sigue válido (I5) y el estado nunca se movió
 (I3) — es el mismo `id(nodo.estado)` de punta a punta.
 
+**Para ver esa misma corrida de un vistazo** (no una ilustración: son los
+datos reales que produjo la corrida de arriba), abrí
+[`docs/timeline.html`](docs/timeline.html) en el navegador — es un archivo
+estático, sin servidor ni dependencias. Se regenera con
+`python docs/capturar_datos.py`.
+
 ## Qué se declara en el submission
 
 **Preexistente** (fuera de la ventana del hackathon 14/9–12/10, declarado como
