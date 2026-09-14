@@ -1,0 +1,67 @@
+{
+  "escenarios": [
+    {
+      "id": "cadena_real",
+      "titulo": "La cadena real, sin tocar",
+      "explicacion": "Los 3 checkpoints exactos que produjo la corrida, verificados desde H0_GENESIS.",
+      "resultado": true,
+      "detalle": "H0_GENESIS = dd2ce1fe33cbcad0…"
+    },
+    {
+      "id": "raiz_equivocada",
+      "titulo": "Verificar contra otra raíz",
+      "explicacion": "Misma cadena, pero se le pide que verifique contra una raíz que no es H0_GENESIS — una cadena que no conmutó no tiene checkpoint válido (§5).",
+      "resultado": false,
+      "detalle": "raíz usada = 0000000000000000… (no es H0_GENESIS)"
+    },
+    {
+      "id": "eslabon_faltante",
+      "titulo": "Sacar el primer eslabón",
+      "explicacion": "Se verifica la cadena sin el checkpoint de la generación 1 — el resto queda huérfano, sin ancestro válido.",
+      "resultado": false,
+      "detalle": "quedan 2 de 3 checkpoints"
+    },
+    {
+      "id": "orden_invertido",
+      "titulo": "Invertir el orden",
+      "explicacion": "Los mismos 3 checkpoints, en orden inverso — el linaje es una cadena, no un conjunto.",
+      "resultado": false,
+      "detalle": "gen 3 → gen 2 → gen 1 en vez de 1 → 2 → 3"
+    },
+    {
+      "id": "insumos_reales",
+      "titulo": "Un solo checkpoint, insumos reales",
+      "explicacion": "El primer checkpoint, verificado con sus tres insumos reales tal como salieron de la corrida.",
+      "resultado": true,
+      "detalle": "H0_B = 10dc54204513e4b6…"
+    },
+    {
+      "id": "ancestro_alterado",
+      "titulo": "Alterar el ancestro",
+      "explicacion": "Mismo H0_B, pero se le dice que su ancestro es otro H0 — el hash no reproduce.",
+      "resultado": false,
+      "detalle": "H0_ancestro real = dd2ce1fe33cbcad0…, se probó con 0000000000000000…"
+    },
+    {
+      "id": "estado_disparador_alterado",
+      "titulo": "Alterar el estado que disparó",
+      "explicacion": "Mismo H0_B, mismo ancestro, pero el `state_trigger` (el estado que gatilló la transición) es otro.",
+      "resultado": false,
+      "detalle": "state_trigger real = 42ceb2c07dbe7d21…, se probó con 0000000000000000…"
+    },
+    {
+      "id": "parametro_alterado",
+      "titulo": "Alterar un solo parámetro",
+      "explicacion": "Se cambia `tiempo_bloque_ms` en los params nuevos — un solo campo, todo lo demás igual.",
+      "resultado": false,
+      "detalle": "tiempo_bloque_ms real → 5000 (el resto de params_nuevos sin cambios)"
+    },
+    {
+      "id": "interfaz_alterada",
+      "titulo": "Alterar solo la interfaz (formatos)",
+      "explicacion": "Se agrega o se saca un formato del conjunto — los formatos entran al hash igual que los parámetros internos.",
+      "resultado": false,
+      "detalle": "formatos reales = ['direccion/gen0', 'firma/ed25519', 'recibo/gen0']"
+    }
+  ]
+}
