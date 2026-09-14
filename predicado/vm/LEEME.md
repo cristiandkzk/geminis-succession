@@ -1,5 +1,7 @@
 # La máquina — §6.2, Fase 4
 
+*[Read this in English](LEEME.en.md)*
+
 **Acá cambia el lenguaje y es a propósito.** El resto de `genesis/` está en Python porque lo que
 modela son reglas, y las reglas se leen. Esto no: es la pieza que I1 congela para siempre y la
 única que corre código de terceros bajo presupuesto.
@@ -57,24 +59,15 @@ cargo run --release --bin vectores verificar  # la compara con vectores.csv
 
 ### En el teléfono (Termux, aarch64) — lo que falta para cerrar C3
 
-**Este crate no es autocontenido:** `lib.rs` hace `include_bytes!` del ELF del guest de Test 2,
-que vive cuatro niveles más arriba. Copiar sólo esta carpeta al teléfono no compila. El paquete
-mínimo —con las rutas relativas intactas, ~130 KB— lo arma:
-
-```
-python genesis/herramientas/empaquetar_vm.py --probar
-```
-
-`--probar` lo extrae en un directorio limpio y lo compila ahí, que es la única forma de saber
-que no falta nada: un paquete que compila *porque el resto del repo estaba al lado* no sirve
-para lo que se hizo.
-
-Después, en Termux:
+**Este crate no es autocontenido:** `lib.rs` hace `include_bytes!` de dos ELF de guest —el de
+Test 2 (`test2-interprete/telefono/guest-rv/guest.elf`, tres niveles arriba de `src/`) y el propio
+(`guest-sha/guest.elf`, al lado). En este repo los dos ya están commiteados en la ruta que
+`lib.rs` espera, así que alcanza con copiar el repo entero (o `predicado/` + `test2-interprete/`
+juntos, con las rutas relativas intactas) al teléfono:
 
 ```
 pkg install -y rust tar
-tar xzf vm-telefono.tar.gz
-cd genesis/predicado/vm
+cd predicado/vm
 cargo run --release --bin vectores verificar
 ```
 

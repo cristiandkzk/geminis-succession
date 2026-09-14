@@ -1,5 +1,7 @@
 # Geminis · demo de conmutación generacional (Colosseum Crypto World's Fair)
 
+*[Read this in English](README.en.md)*
+
 Este repo es el submission del hackathon **Colosseum Crypto World's Fair**
 (14/9–12/10/2026). Es un recorte de **Geminis** (antes *Genesis*,
 [`github.com/cristiandkzk/Genesis`](https://github.com/cristiandkzk/Genesis)),
