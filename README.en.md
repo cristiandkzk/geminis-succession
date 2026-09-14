@@ -122,16 +122,24 @@ cd predicado/vm && cargo run --release --bin bloque   # 3. the successor running
 
 ## What's declared in the submission
 
-**Pre-existing** (outside the hackathon window, declared as such): the full
-Geminis paper, the evidence against Ethereum (EIP-7892/8261/8368), and the
-interpreter-budget benchmark from `test2-interprete` (3.2–3.7× native with
-JIT, not the 26–54× of a pure interpreter the paper had assumed).
+**Pre-existing** (outside the 9/14–10/12 hackathon window, declared as
+such): the full Geminis paper, the evidence against Ethereum
+(EIP-7892/8261/8368), the interpreter-budget benchmark from
+`test2-interprete` (3.2–3.7× native with JIT, not the 26–54× of a pure
+interpreter the paper had assumed) — **and the succession engine and the
+machine themselves** (Phase 0-1 and Phase 4 of the reference implementation,
+built and committed to the `Geminis` repo on 8/22/2026, commit `8cbeeb2`,
+three and a half weeks before the window opened). The mechanism running here
+was designed and tested before the hackathon; this doesn't hide that.
 
-**New, within the 9/14–10/12 window:** this slice — the generational-switch
-simulator running (Phase 0-1), the cryptographic canary as a real trigger,
-the RV32IM machine that executes the successor under budget (Phase 4), and
-the second-ceiling finding (memory pages, 23× without cache). Each piece is
-datable by commit in this repo.
+**New, within the 9/14–10/12 window:** this repo. The self-contained slice
+(`geminis-succession`), ported and verified on 9/14; the explicit
+`Verify(checkpoints, H0_GENESIS)` added to `herramientas/demo.py` (the
+original didn't print it); the bilingual docs; and the fix to the phone
+packaging instructions, which had gone stale during the port. This is what
+turns private research into something anyone can clone and run end to end —
+each of these changes is datable by commit in this repo, not the original
+one.
 
 ## What's deliberately missing from this slice
 

@@ -122,17 +122,24 @@ cd predicado/vm && cargo run --release --bin bloque   # 3. la sucesora corriendo
 
 ## Qué se declara en el submission
 
-**Preexistente** (fuera de la ventana del hackathon, declarado como tal):
-el paper completo de Geminis, la evidencia contra Ethereum (EIP-7892/8261/8368)
-y el benchmark de presupuesto del intérprete de `test2-interprete`
-(3,2–3,7× nativo con JIT, no los 26–54× de intérprete puro que el paper
-asumía).
+**Preexistente** (fuera de la ventana del hackathon 14/9–12/10, declarado como
+tal): el paper completo de Geminis, la evidencia contra Ethereum
+(EIP-7892/8261/8368), el benchmark de presupuesto del intérprete de
+`test2-interprete` (3,2–3,7× nativo con JIT, no los 26–54× de intérprete puro
+que el paper asumía) — **y el motor de sucesión y la máquina en sí** (Fase 0-1
+y Fase 4 de la implementación de referencia, construidas y commiteadas en el
+repo `Geminis` el 22/8/2026, commit `8cbeeb2`, tres semanas y media antes de
+que abriera la ventana). El mecanismo que corre acá se diseñó y se probó
+antes del hackathon; esto no lo esconde.
 
-**Nuevo, dentro de la ventana 14/9–12/10:** este recorte — el simulador de
-conmutación generacional corriendo (Fase 0-1), el canario criptográfico como
-trigger real, la máquina RV32IM que ejecuta la sucesora bajo presupuesto
-(Fase 4) y el hallazgo del segundo techo (páginas de memoria, 23× sin caché).
-Cada pieza se puede fechar por commit en este repo.
+**Nuevo, dentro de la ventana 14/9–12/10:** este repo. El recorte
+self-contained (`geminis-succession`), portado y verificado el 14/9; el
+`Verify(checkpoints, H0_GENESIS)` explícito agregado a `herramientas/demo.py`
+(el original no lo imprimía); la documentación bilingüe; y la corrección de
+las instrucciones de empaquetado para teléfono, que habían quedado
+desactualizadas al portar. Es lo que convierte investigación privada en algo
+que cualquiera puede clonar y correr de punta a punta — cada uno de estos
+cambios está fechado por commit en este repo, no en el original.
 
 ## Qué falta a propósito (no está en este recorte)
 
