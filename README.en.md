@@ -93,33 +93,6 @@ assertion hidden inside a test. Above that, the line
 stays readable after two switches: the old object is still valid (I5) and
 state never moved (I3) — it's the same `id(nodo.estado)` start to finish.
 
-## The full demo, end to end (recording script)
-
-**On purpose, this isn't a code walkthrough.** The video shows the
-mechanism happening, not proof that the code compiles — that's why
-`verificar.py` (the test suite) stays out of the recording: it's evidence
-for someone reading the repo, not the product in action. What counts as
-"the product running": a node hitting a real trigger and switching its own
-rules on camera, and the successor primitive actually executing — not a
-benchmark.
-
-```
-python herramientas/demo.py                          # 1. the switch running, and Verify() = True
-cd predicado/vm && cargo run --release --bin bloque   # 2. the successor running as bytecode, under budget
-```
-
-**~3-minute structure:**
-
-| time | on screen | what to say |
-|---|---|---|
-| 0:00–0:20 | empty terminal, no code on screen | the problem, in one line: every chain eventually needs a human-coordinated fork — Geminis doesn't |
-| 0:20–1:30 | `herramientas/demo.py` running live | point out in real time: the ML-DSA-44 canary gets spent, fires the successor, the node switches without moving state, and pause on `Verify(checkpoints, H0_GENESIS) = True` |
-| 1:30–2:30 | `cargo run --bin bloque` running live | the successor primitive (ML-DSA-87) executing as real bytecode, under a budget of steps and pages — not a metric, it's what runs right after the switch above |
-| 2:30–3:00 | the repo on GitHub (README, not code) + link | why it matters, and that everything shown is reproducible by anyone |
-
-Both steps are the same narrative thread (a switch, and what runs after
-it) — not two unrelated features.
-
 ## What's declared in the submission
 
 **Pre-existing** (outside the 9/14–10/12 hackathon window, declared as
