@@ -17,6 +17,14 @@ python verificar.py -v    # con el nombre de cada criterio
 
 Sin dependencias: sólo la biblioteca estándar de Python 3.11+.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/figura-conmutacion-dark.svg">
+  <img src="docs/figura-conmutacion-light.svg" alt="La pista del nodo no se corta en el bloque de transición: cambia de reglas. El estado cruza intacto porque nunca sale del proceso que lo tiene.">
+</picture>
+
+*La pista del nodo no se corta en el bloque de transición: cambia de reglas.
+El estado cruza intacto porque nunca sale del proceso que lo tiene.*
+
 ## Qué es esto exactamente
 
 El mecanismo central del paper (§2): un nodo llega a un *trigger*, computa

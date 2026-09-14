@@ -17,6 +17,14 @@ python verificar.py -v    # with each criterion's name
 
 No dependencies: Python 3.11+ standard library only.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/figura-conmutacion-dark.en.svg">
+  <img src="docs/figura-conmutacion-light.en.svg" alt="The node's track doesn't stop at the transition block: it switches rules. State crosses over intact because it never leaves the process that holds it.">
+</picture>
+
+*The node's track doesn't stop at the transition block: it switches rules.
+State crosses over intact because it never leaves the process that holds it.*
+
 ## What this actually is
 
 The paper's core mechanism (§2): a node reaches a *trigger*, computes

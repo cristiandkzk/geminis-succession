@@ -1,0 +1,42 @@
+<svg viewBox="0 0 640 250" width="640" height="250" xmlns="http://www.w3.org/2000/svg"
+     font-family="ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, 'Liberation Mono', monospace"
+     role="img" aria-label="Diagrama: una sola pista de nodo que conmuta de la generación A a la generación B en el bloque de transición, con el estado conservado y el hash de la generación B derivado del de A.">
+  <rect x="0" y="0" width="640" height="250" fill="#141B1D"/>
+
+  <text x="18" y="30" font-size="11" letter-spacing=".08em" fill="#859294">GENERACIÓN A</text>
+  <text x="366" y="30" font-size="11" letter-spacing=".08em" fill="#4EC6BE">GENERACIÓN B</text>
+
+  <rect x="18" y="46" width="336" height="44" fill="#1A2325" stroke="#253032" stroke-width="1"/>
+  <rect x="354" y="46" width="268" height="44" fill="#16302F" stroke="#4EC6BE" stroke-width="1"/>
+  <text x="30" y="73" font-size="9.5" letter-spacing=".06em" fill="#859294">ruleset A</text>
+  <text x="366" y="73" font-size="9.5" letter-spacing=".06em" fill="#4EC6BE">ruleset B</text>
+
+  <line x1="18" y1="120" x2="622" y2="120" stroke="#E3E9E9" stroke-width="1.5"/>
+  <text x="18" y="140" font-size="9.5" letter-spacing=".06em" fill="#E3E9E9">el MISMO nodo · el MISMO estado · sin migración, sin bridge, sin snapshot</text>
+
+  <g fill="#1A2325" stroke="#253032" stroke-width="1">
+    <rect x="40"  y="112" width="15" height="16"/>
+    <rect x="80"  y="112" width="15" height="16"/>
+    <rect x="120" y="112" width="15" height="16"/>
+    <rect x="160" y="112" width="15" height="16"/>
+    <rect x="200" y="112" width="15" height="16"/>
+    <rect x="240" y="112" width="15" height="16"/>
+    <rect x="280" y="112" width="15" height="16"/>
+    <rect x="320" y="112" width="15" height="16"/>
+  </g>
+  <g fill="#16302F" stroke="#4EC6BE" stroke-width="1">
+    <rect x="390" y="112" width="15" height="16"/>
+    <rect x="430" y="112" width="15" height="16"/>
+    <rect x="470" y="112" width="15" height="16"/>
+    <rect x="510" y="112" width="15" height="16"/>
+    <rect x="550" y="112" width="15" height="16"/>
+  </g>
+
+  <line x1="366" y1="38" x2="366" y2="176" stroke="#4EC6BE" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <text x="366" y="192" font-size="9.5" letter-spacing=".06em" fill="#4EC6BE" text-anchor="middle">bloque de transición</text>
+  <text x="366" y="206" font-size="9.5" letter-spacing=".06em" fill="#859294" text-anchor="middle">TRANSITION_RULE → TRUE</text>
+
+  <text x="18" y="232" font-size="9.5" letter-spacing=".06em" fill="#859294">H0_A</text>
+  <line x1="56" y1="228" x2="176" y2="228" stroke="#253032" stroke-width="1"/>
+  <text x="184" y="232" font-size="9.5" letter-spacing=".06em" fill="#E3E9E9">H0_B = H( H0_A ‖ state_trigger ‖ params_nuevos )</text>
+</svg>
