@@ -4,7 +4,7 @@
 
 Este repo es el submission del hackathon **Colosseum Crypto World's Fair**
 (14/9–12/10/2026). Es un recorte de **Geminis** (antes *Genesis*,
-[`github.com/cristiandkzk/Genesis`](https://github.com/cristiandkzk/Genesis)),
+[`github.com/cristiandkzk/Geminis`](https://github.com/cristiandkzk/Geminis)),
 un protocolo que hace que una cadena cambie su propio *ruleset* —incluida la
 primitiva criptográfica que la firma— sin fork humano, verificable por
 cualquiera. El diseño completo está en el paper del repo Geminis; acá vive
