@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Geminis · rompé el linaje</title>
+<title>Geminis · break the lineage</title>
 <style>
   :root {
     --ground: #F6F8F8; --surface: #FFFFFF; --surface-alt: #EEF2F2;
@@ -75,14 +75,14 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Geminis — rompé el linaje</h1>
-  <p class="sub">Nueve formas reales de correr <code>Verify(H0_B, H0_A, state_trigger, params)</code>
-    contra la cadena real que produjo el demo — dos pasan, siete no. Cada resultado se calculó
-    corriendo el código de verdad, no acá en el navegador.</p>
+  <h1>Geminis — break the lineage</h1>
+  <p class="sub">Nine real ways to run <code>Verify(H0_B, H0_A, state_trigger, params)</code>
+    against the real chain the demo produced — two pass, seven don't. Every result was
+    computed by running the real code, not simulated here in the browser.</p>
 
-  <p class="note">Generado con <code>python docs/capturar_verify_demo.py</code>, que corre los
-    mismos escenarios que <code>pruebas/test_linaje.py</code> (I4) contra una corrida real y
-    guarda qué dio cada uno.</p>
+  <p class="note">Generated with <code>python docs/capturar_verify_demo.py</code>, which runs
+    the same scenarios as <code>pruebas/test_linaje.py</code> (I4) against a real run and
+    saves what each one gave.</p>
 
   <div class="grid">
     <div class="list" id="list"></div>
@@ -95,66 +95,66 @@
   "escenarios": [
     {
       "id": "cadena_real",
-      "titulo": "La cadena real, sin tocar",
-      "explicacion": "Los 3 checkpoints exactos que produjo la corrida, verificados desde H0_GENESIS.",
+      "titulo": "The real chain, untouched",
+      "explicacion": "The exact 3 checkpoints the run produced, verified from H0_GENESIS.",
       "resultado": true,
       "detalle": "H0_GENESIS = dd2ce1fe33cbcad0…"
     },
     {
       "id": "raiz_equivocada",
-      "titulo": "Verificar contra otra raíz",
-      "explicacion": "Misma cadena, pero se le pide que verifique contra una raíz que no es H0_GENESIS — una cadena que no conmutó no tiene checkpoint válido (§5).",
+      "titulo": "Verify against another root",
+      "explicacion": "Same chain, but asked to verify against a root that isn't H0_GENESIS — a chain that never switched has no valid checkpoint (§5).",
       "resultado": false,
-      "detalle": "raíz usada = 0000000000000000… (no es H0_GENESIS)"
+      "detalle": "root used = 0000000000000000… (not H0_GENESIS)"
     },
     {
       "id": "eslabon_faltante",
-      "titulo": "Sacar el primer eslabón",
-      "explicacion": "Se verifica la cadena sin el checkpoint de la generación 1 — el resto queda huérfano, sin ancestro válido.",
+      "titulo": "Remove the first link",
+      "explicacion": "The chain is verified without generation 1's checkpoint — the rest is left orphaned, with no valid ancestor.",
       "resultado": false,
-      "detalle": "quedan 2 de 3 checkpoints"
+      "detalle": "2 of 3 checkpoints remain"
     },
     {
       "id": "orden_invertido",
-      "titulo": "Invertir el orden",
-      "explicacion": "Los mismos 3 checkpoints, en orden inverso — el linaje es una cadena, no un conjunto.",
+      "titulo": "Reverse the order",
+      "explicacion": "The same 3 checkpoints, in reverse order — lineage is a chain, not a set.",
       "resultado": false,
-      "detalle": "gen 3 → gen 2 → gen 1 en vez de 1 → 2 → 3"
+      "detalle": "gen 3 → gen 2 → gen 1 instead of 1 → 2 → 3"
     },
     {
       "id": "insumos_reales",
-      "titulo": "Un solo checkpoint, insumos reales",
-      "explicacion": "El primer checkpoint, verificado con sus tres insumos reales tal como salieron de la corrida.",
+      "titulo": "A single checkpoint, real inputs",
+      "explicacion": "The first checkpoint, verified with its three real inputs exactly as the run produced them.",
       "resultado": true,
       "detalle": "H0_B = 10dc54204513e4b6…"
     },
     {
       "id": "ancestro_alterado",
-      "titulo": "Alterar el ancestro",
-      "explicacion": "Mismo H0_B, pero se le dice que su ancestro es otro H0 — el hash no reproduce.",
+      "titulo": "Tamper with the ancestor",
+      "explicacion": "Same H0_B, but told its ancestor is a different H0 — the hash doesn't reproduce.",
       "resultado": false,
-      "detalle": "H0_ancestro real = dd2ce1fe33cbcad0…, se probó con 0000000000000000…"
+      "detalle": "real H0_ancestro = dd2ce1fe33cbcad0…, tested with 0000000000000000…"
     },
     {
       "id": "estado_disparador_alterado",
-      "titulo": "Alterar el estado que disparó",
-      "explicacion": "Mismo H0_B, mismo ancestro, pero el `state_trigger` (el estado que gatilló la transición) es otro.",
+      "titulo": "Tamper with the triggering state",
+      "explicacion": "Same H0_B, same ancestor, but the `state_trigger` (the state that fired the transition) is different.",
       "resultado": false,
-      "detalle": "state_trigger real = 42ceb2c07dbe7d21…, se probó con 0000000000000000…"
+      "detalle": "real state_trigger = 42ceb2c07dbe7d21…, tested with 0000000000000000…"
     },
     {
       "id": "parametro_alterado",
-      "titulo": "Alterar un solo parámetro",
-      "explicacion": "Se cambia `tiempo_bloque_ms` en los params nuevos — un solo campo, todo lo demás igual.",
+      "titulo": "Tamper with a single parameter",
+      "explicacion": "`tiempo_bloque_ms` is changed in the new params — one field, everything else identical.",
       "resultado": false,
-      "detalle": "tiempo_bloque_ms real → 5000 (el resto de params_nuevos sin cambios)"
+      "detalle": "real tiempo_bloque_ms → 5000 (rest of new_params unchanged)"
     },
     {
       "id": "interfaz_alterada",
-      "titulo": "Alterar solo la interfaz (formatos)",
-      "explicacion": "Se agrega o se saca un formato del conjunto — los formatos entran al hash igual que los parámetros internos.",
+      "titulo": "Tamper with only the interface (formats)",
+      "explicacion": "A format is added to or removed from the set — formats enter the hash the same as internal parameters do.",
       "resultado": false,
-      "detalle": "formatos reales = ['direccion/gen0', 'firma/ed25519', 'recibo/gen0']"
+      "detalle": "real formats = ['direccion/gen0', 'firma/ed25519', 'recibo/gen0']"
     }
   ]
 }
@@ -175,7 +175,7 @@ function render(idx) {
       <span class="dot"></span> Verify(...) = ${e.resultado ? 'True' : 'False'}
     </div>
     <div class="detail">${e.detalle}</div>
-    <p class="call">Llamada real: <code>${e.id.startsWith('cadena') || e.id.includes('raiz') || e.id.includes('eslabon') || e.id.includes('orden')
+    <p class="call">Real call: <code>${e.id.startsWith('cadena') || e.id.includes('raiz') || e.id.includes('eslabon') || e.id.includes('orden')
       ? 'verificar_linaje(checkpoints, h0_raiz)' : 'verificar(h0, h0_ancestro, state_trigger, params)'}</code></p>
   `;
 }
