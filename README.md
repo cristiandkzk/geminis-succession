@@ -3,12 +3,13 @@
 *[Read this in English](README.en.md)*
 
 Este repo es el submission del hackathon **Colosseum Crypto World's Fair**
-(14/9–12/10/2026). Es un recorte de **Geminis** (antes *Genesis*,
-[`github.com/cristiandkzk/Geminis`](https://github.com/cristiandkzk/Geminis)),
+(14/9–12/10/2026). Es un recorte de **Geminis** (diseño de sucesión determinista,
+[`github.com/cristiandkzk/deterministic-succession`](https://github.com/cristiandkzk/deterministic-succession)),
 un protocolo que hace que una cadena cambie su propio *ruleset* —incluida la
 primitiva criptográfica que la firma— sin fork humano, verificable por
-cualquiera. El diseño completo está en el paper del repo Geminis; acá vive
-sólo el mecanismo mínimo, corriendo.
+cualquiera. El diseño completo, el paper (bilingüe), y cómo contribuir
+mediciones propias están en ese repo; acá vive sólo el mecanismo mínimo,
+corriendo.
 
 **Demo en vivo (sin clonar nada):** [geminis-succession-ihy4.vercel.app](https://geminis-succession-ihy4.vercel.app/)
 — una corrida real visualizada, y un panel para romper el linaje y ver
