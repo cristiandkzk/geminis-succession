@@ -46,16 +46,18 @@ This slice is **Phase 0 and Phase 1** of Geminis's reference implementation
 | `protocolo/generacion.py` | ruleset, generation tag, fail-closed decoding (I5) |
 | `protocolo/linaje.py` | `H0_B = H(H0_A ‖ state_trigger ‖ params)` and its `Verify` (I4) |
 | `protocolo/invariantes.py` | I1–I5 as executable predicates |
-| `sucesion/regla.py` | `TRANSITION_RULE` — includes `ReglaCanarioCriptografico`: the trigger is a broken ML-DSA-44 canary, which fires the ML-DSA-87 successor (§6.6) |
+| `sucesion/regla.py` | `TRANSITION_RULE` — includes `ReglaCanarioCriptografico`: the trigger is a broken ML-DSA-44 canary, which activates a new successor primitive (§6.6) |
 | `sucesion/cronograma.py` | trigger → lock-in → activation, with more than one transition in flight |
 | `sucesion/conmutador.py` | the switch itself |
 | `estado/sintetico.py` | minimal state: balances + generation tag |
 | `nodo/pod.py` | applies blocks, evaluates the rule, switches, reorganizes |
 | `pruebas/` | the 81 criteria, with the criterion's text in the docstring |
 
-**The canary case is already included**: `ReglaCanarioCriptografico` uses real
-ML-DSA levels (44 as the weak primitive, 87 as the successor) — not an
-invented toy. The canary is derived from a public seed (`g.CANARIO_SEMILLA`)
+**The canary case is already included**: `ReglaCanarioCriptografico` uses a
+real ML-DSA level (44) as the canary — not an invented value. The successor
+format is a configurable parameter of the rule; this run uses the same name
+by default, like the rest of the slice's parameters (disposable by
+declaration). The canary is derived from a public seed (`g.CANARIO_SEMILLA`)
 and the node verifies it on every block: an instance that doesn't come from
 that seed doesn't pass (`pruebas/test_i2_quien_elige_el_momento.py`).
 

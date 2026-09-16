@@ -46,7 +46,7 @@ Geminis (`genesis/` en el repo completo), portadas tal cual:
 | `protocolo/generacion.py` | ruleset, etiqueta de generación, decodificación que falla cerrado (I5) |
 | `protocolo/linaje.py` | `H0_B = H(H0_A ‖ state_trigger ‖ params)` y su `Verify` (I4) |
 | `protocolo/invariantes.py` | I1–I5 ejecutables |
-| `sucesion/regla.py` | `TRANSITION_RULE` — incluye `ReglaCanarioCriptografico`: el trigger es un canario ML-DSA-44 roto, que dispara la sucesora ML-DSA-87 (§6.6) |
+| `sucesion/regla.py` | `TRANSITION_RULE` — incluye `ReglaCanarioCriptografico`: el trigger es un canario ML-DSA-44 roto, que activa una primitiva sucesora nueva (§6.6) |
 | `sucesion/cronograma.py` | disparo → lock-in → activación, con más de una transición en vuelo |
 | `sucesion/conmutador.py` | la conmutación en sí |
 | `estado/sintetico.py` | el estado mínimo: balances + tag de generación |
@@ -54,8 +54,11 @@ Geminis (`genesis/` en el repo completo), portadas tal cual:
 | `pruebas/` | los 81 criterios, con el texto del criterio en el docstring |
 
 **El caso del canario ya viene incluido**: `ReglaCanarioCriptografico` usa
-niveles reales de ML-DSA (44 como primitiva débil, 87 como sucesora) — no un
-juguete inventado. El canario se deriva de una semilla pública
+un nivel real de ML-DSA (44) como canario — no un valor inventado. El
+formato sucesor es un parámetro configurable de la regla; en esta corrida
+usa el mismo nombre por default, como el resto de los parámetros del
+recorte (desechables por declaración). El canario se deriva de una semilla
+pública
 (`g.CANARIO_SEMILLA`) y el nodo lo verifica en cada bloque: una instancia que
 no sale de esa semilla no pasa (`pruebas/test_i2_quien_elige_el_momento.py`).
 
