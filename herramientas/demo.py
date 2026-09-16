@@ -65,46 +65,46 @@ def main() -> int:
             if clave not in disparos_vistos:
                 disparos_vistos.add(clave)
                 eventos.append(
-                    f"  {disparo.altura:>4}  disparo (advisorio)  {regla}"
+                    f"  {disparo.altura:>4}  trigger (advisory)  {regla}"
                 )
         for punto in nodo.cronograma.checkpoints:
             if punto.h0 not in lockins_vistos:
                 lockins_vistos.add(punto.h0)
                 aviso = punto.altura_activacion - punto.altura_lockin
                 delta = g.delta(punto.clase)
-                cola = "" if aviso == delta else f", esperó {aviso - delta} a la anterior"
+                cola = "" if aviso == delta else f", waited {aviso - delta} extra for the one ahead"
                 eventos.append(
                     f"  {punto.altura_lockin:>4}  LOCK-IN gen {punto.generacion}"
                     f"  {punto.regla}"
-                    f"  ->  activa en {punto.altura_activacion}"
-                    f"  (aviso {aviso}; Δ de {punto.clase} = {delta}{cola})"
+                    f"  ->  activates at {punto.altura_activacion}"
+                    f"  (notice {aviso}; Δ of {punto.clase} = {delta}{cola})"
                 )
         for conmutacion in nodo.conmutaciones:
             clave = (f"conmuta/{conmutacion.generacion}", conmutacion.altura)
             if clave not in disparos_vistos:
                 disparos_vistos.add(clave)
                 eventos.append(
-                    f"  {conmutacion.altura:>4}  CONMUTA a la generación "
+                    f"  {conmutacion.altura:>4}  SWITCHES to generation "
                     f"{conmutacion.generacion}"
                 )
 
-    print(f"Genesis · {BLOQUES + 2} bloques, ventana de finalidad "
+    print(f"Geminis · {BLOQUES + 2} blocks, finality window "
           f"{g.VENTANA_FINALIDAD}\n")
     print("\n".join(eventos))
     print()
     print(nodo.resumen())
     print()
     print(
-        "el mismo proceso, el mismo estado: "
-        f"arranques={nodo.arranques}, estado={'el mismo' if id(nodo.estado) == identidad else 'OTRO'}, "
+        "same process, same state: "
+        f"restarts={nodo.arranques}, state={'unchanged' if id(nodo.estado) == identidad else 'OTHER'}, "
         f"alice={nodo.estado.saldos['alice']}, "
-        f"recibo-1 nació en la generación {nodo.estado.objetos['recibo-1'].generacion}"
+        f"recibo-1 was born in generation {nodo.estado.objetos['recibo-1'].generacion}"
     )
 
     checkpoints = nodo.cronograma.checkpoints
     ok = verificar_linaje(checkpoints, g.H0_GENESIS)
     print()
-    print(f"Verify(checkpoints, H0_GENESIS) = {ok}  ({len(checkpoints)} generaciones encadenadas)")
+    print(f"Verify(checkpoints, H0_GENESIS) = {ok}  ({len(checkpoints)} chained generations)")
     for punto in checkpoints:
         print(f"  gen {punto.generacion}: H0 = {punto.h0.hex()[:16]}…  <- {punto.regla}")
     return 0

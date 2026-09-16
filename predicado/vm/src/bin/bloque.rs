@@ -31,8 +31,8 @@ const TX: usize = vm::TX_INICIAL as usize;
 const PRESUPUESTO_MS: f64 = 1500.0;
 
 fn main() {
-    println!("# C1 — {} verificaciones ML-DSA-44 como un bloque. Presupuesto: {:.0} ms.", TX, PRESUPUESTO_MS);
-    println!("# maquina: {}", std::env::consts::ARCH);
+    println!("# C1 — {} ML-DSA-44 verifications as one block. Budget: {:.0} ms.", TX, PRESUPUESTO_MS);
+    println!("# machine: {}", std::env::consts::ARCH);
 
     let mut t_admision = 0.0_f64;
     let mut t_arranque = 0.0_f64;
@@ -81,11 +81,11 @@ fn main() {
 
     let ms = |s: f64| s * 1000.0;
     println!();
-    println!("tramo,ms_totales,ms_por_tx,%_del_presupuesto");
+    println!("stage,ms_total,ms_per_tx,%_of_budget");
     for (nombre, t) in [
-        ("admision", t_admision),
-        ("arranque+prepare (andamiaje)", t_arranque),
-        ("verificacion", t_verificacion),
+        ("admission", t_admision),
+        ("startup+prepare (scaffolding)", t_arranque),
+        ("verification", t_verificacion),
     ] {
         println!(
             "{},{:.1},{:.2},{:.1}",
@@ -95,12 +95,12 @@ fn main() {
             100.0 * ms(t) / PRESUPUESTO_MS
         );
     }
-    println!("bloque completo,{:.1},{:.2},{:.1}", total, total / TX as f64, 100.0 * total / PRESUPUESTO_MS);
+    println!("full block,{:.1},{:.2},{:.1}", total, total / TX as f64, 100.0 * total / PRESUPUESTO_MS);
 
     println!();
-    println!("# pasos por verificacion: {}", pasos_totales / TX as u64);
-    println!("# techo de pasos por tx: {} — excedidos: {}", vm::TECHO_INICIAL, techo_excedido);
-    println!("# techo de paginas: {} — maximo usado: {}", vm::PAGINAS_INICIALES, paginas_max);
+    println!("# steps per verification: {}", pasos_totales / TX as u64);
+    println!("# step ceiling per tx: {} — exceeded: {}", vm::TECHO_INICIAL, techo_excedido);
+    println!("# page ceiling: {} — max used: {}", vm::PAGINAS_INICIALES, paginas_max);
 
     // ------------------------------------------------------------------ #
     // La otra forma de medir, la que el criterio dice que NO vale: las mismas
@@ -117,13 +117,13 @@ fn main() {
     m.llamar(*syms.get("run").expect("run"), &[0, TX as u32]);
     let caliente = t3.elapsed().as_secs_f64() * 1000.0;
     println!(
-        "# {} verificaciones calientes en una instancia: {:.1} ms ({:.2} ms/tx)",
+        "# {} hot verifications in one instance: {:.1} ms ({:.2} ms/tx)",
         TX,
         caliente,
         caliente / TX as f64
     );
     println!(
-        "# como bloque cuesta {:.2}x eso",
+        "# as a block it costs {:.2}x that",
         ms(t_verificacion) / caliente
     );
 
@@ -131,14 +131,14 @@ fn main() {
     println!();
     if cobrable <= PRESUPUESTO_MS {
         println!(
-            "# C1 APROBADO — admision + verificacion: {:.0} ms de {:.0} ({:.2}x de margen)",
+            "# C1 PASSED — admission + verification: {:.0} ms of {:.0} ({:.2}x margin)",
             cobrable,
             PRESUPUESTO_MS,
             PRESUPUESTO_MS / cobrable
         );
     } else {
         println!(
-            "# C1 REPROBADO — admision + verificacion: {:.0} ms de {:.0} ({:.2}x por encima)",
+            "# C1 FAILED — admission + verification: {:.0} ms of {:.0} ({:.2}x over)",
             cobrable,
             PRESUPUESTO_MS,
             cobrable / PRESUPUESTO_MS

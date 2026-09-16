@@ -361,19 +361,19 @@ class Cronograma:
     # -- diagnóstico ------------------------------------------------------- #
 
     def resumen(self) -> str:
-        lineas = [f"generación comprometida: {self.generacion_comprometida}"]
+        lineas = [f"committed generation: {self.generacion_comprometida}"]
         for disparo in self.pendientes.values():
-            lineas.append(f"  disparo advisorio  {disparo.nombre} en {disparo.altura}")
+            lineas.append(f"  advisory trigger  {disparo.nombre} at {disparo.altura}")
         for punto in self.checkpoints:
             lineas.append(
                 f"  lock-in gen {punto.generacion:>2}  {punto.clase}"
-                f"  disparo {punto.altura_disparo}"
+                f"  trigger {punto.altura_disparo}"
                 f" -> lock-in {punto.altura_lockin}"
-                f" -> activación {punto.altura_activacion}"
+                f" -> activation {punto.altura_activacion}"
             )
         for rechazo in self.rechazos:
             lineas.append(
-                f"  RECHAZO {rechazo.regla} en {rechazo.altura}: {rechazo.motivo}"
+                f"  REJECTED {rechazo.regla} at {rechazo.altura}: {rechazo.motivo}"
             )
         return "\n".join(lineas)
 

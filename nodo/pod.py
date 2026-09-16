@@ -309,9 +309,9 @@ class NodoPoD:
 
     def resumen(self) -> str:
         lineas = [
-            f"altura {self.altura} · generación {self.generacion} · "
-            f"arranques {self.arranques}",
-            f"emitido {self.estado.emitido} · quemado {self.estado.quemado}",
+            f"height {self.altura} · generation {self.generacion} · "
+            f"restarts {self.arranques}",
+            f"issued {self.estado.emitido} · burned {self.estado.quemado}",
             self.cronograma.resumen(),
         ]
         for nombre in sorted(self.estado.distancias):

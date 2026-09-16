@@ -80,15 +80,15 @@ class Distancia:
         return self.bloques is not None
 
     def __str__(self) -> str:
-        cola = " (en vuelo)" if self.en_vuelo else ""
+        tail = " (in flight)" if self.en_vuelo else ""
         if self.bloques is None:
             return (
                 f"{self.regla}: {self.progreso}/{self.umbral}, "
-                f"sin aproximación observable{cola}"
+                f"no observable approximation{tail}"
             )
         return (
             f"{self.regla}: {self.progreso}/{self.umbral}, "
-            f"faltan {self.bloques} bloques{cola}"
+            f"{self.bloques} blocks left{tail}"
         )
 
 
