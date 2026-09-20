@@ -3,3 +3,10 @@ __pycache__/
 /predicado/vm/target/
 /VIDEO.md
 /PENDIENTE.md
+
+# Grabaciones del video: no van al repo (pesan decenas de MB y hay una selfie)
+*.mp4
+*.mp3
+*.mov
+*.wav
+*.m4a
