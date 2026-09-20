@@ -16,7 +16,7 @@ running.
 `Verify()` flip from `True` to `False`.
 
 ```
-python verificar.py       # the 81 tests in this slice
+python verificar.py       # the 107 tests in this slice
 python verificar.py -v    # with each criterion's name
 ```
 
@@ -38,7 +38,7 @@ The paper's core mechanism (§2): a node reaches a *trigger*, computes
 `Verify(H0_B, H0_A, ...)` and confirm the succession is legitimate.
 
 This slice is **Phase 0 and Phase 1** of Geminis's reference implementation
-(`genesis/` in the full repo), ported as-is:
+(`geminis/` in the full repo), ported as-is:
 
 | module | what it implements |
 |---|---|
@@ -51,7 +51,9 @@ This slice is **Phase 0 and Phase 1** of Geminis's reference implementation
 | `sucesion/conmutador.py` | the switch itself |
 | `estado/sintetico.py` | minimal state: balances + generation tag |
 | `nodo/pod.py` | applies blocks, evaluates the rule, switches, reorganizes |
-| `pruebas/` | the 81 criteria, with the criterion's text in the docstring |
+| `herramientas/convergencia.py` | four nodes that never coordinate, running — step 2 of the video script |
+| `pruebas/test_convergencia_entre_nodos.py` | four nodes that never coordinate converge bit for bit; the one that picks a different point of the space diverges and is caught with one hash |
+| `pruebas/` | the 107 criteria, with the criterion's text in the docstring |
 
 **The canary case is already included**: `ReglaCanarioCriptografico` uses a
 real ML-DSA level (44) as the canary — not an invented value. The successor
@@ -75,7 +77,7 @@ case of a challenge/dispute, not a trusted benchmark:
 cd predicado/vm
 cargo test --release                          # 20 criteria (C1-C7)
 cargo run --release --bin vectores verificar   # C3: 7 vectors, bit for bit
-cargo run --release --bin bloque               # C1: 67 verifications as a block
+cargo run --release --bin bloque               # C1: 15 ML-DSA-44 verifications as one block
 ```
 
 Two consensus ceilings, not one: steps **and** distinct memory pages touched
@@ -108,8 +110,31 @@ assertion hidden inside a test. Above that, the line
 stays readable after two switches: the old object is still valid (I5) and
 state never moved (I3) — it's the same `id(nodo.estado)` start to finish.
 
+## And four nodes that never talk to each other (`herramientas/convergencia.py`)
+
+The run above is **one** node switching, and that isn't enough for the only
+thing a fork is: two nodes that stop being on the same chain.
+
+```
+python herramientas/convergencia.py
+```
+
+Four nodes built separately, each producing its own blocks — no network, no
+gossip, not even a shared rule object — and the comparison made afterwards,
+from outside: the same `H0_B`, the same switch height, and all 181 block
+hashes matching bit for bit. They didn't agree on it; there was no channel to
+agree over.
+
+Then a fifth one that picked **a different legal point of the space** (it
+quarters the issuance instead of halving it, same trigger, same height): its
+`H0_B` is a different one, and a single hash is enough to know it left. The
+part worth looking at is that **its own lineage verifies** — it has to, it's
+the same hash function. A divergent node isn't caught by `Verify` failing in a
+vacuum; it's caught because its `H0_B` isn't the one Genesis determined for
+that generation.
+
 **To see that same run at a glance** (not an illustration: it's the real
-data that run produced):
+data that `demo.py` produced):
 [geminis-succession-ihy4.vercel.app/timeline.html](https://geminis-succession-ihy4.vercel.app/timeline.html)
 — or open [`docs/timeline.html`](docs/timeline.html) locally, a static
 file, no server, no dependencies. Regenerate it with

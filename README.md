@@ -16,7 +16,7 @@ corriendo.
 `Verify()` pasar de `True` a `False`.
 
 ```
-python verificar.py       # las 81 pruebas de este recorte
+python verificar.py       # las 107 pruebas de este recorte
 python verificar.py -v    # con el nombre de cada criterio
 ```
 
@@ -38,7 +38,7 @@ El mecanismo central del paper (§2): un nodo llega a un *trigger*, computa
 `Verify(H0_B, H0_A, ...)` y confirmar que la sucesión es legítima.
 
 Este recorte es **Fase 0 y Fase 1** de la implementación de referencia de
-Geminis (`genesis/` en el repo completo), portadas tal cual:
+Geminis (`geminis/` en el repo completo), portadas tal cual:
 
 | módulo | qué implementa |
 |---|---|
@@ -51,7 +51,9 @@ Geminis (`genesis/` en el repo completo), portadas tal cual:
 | `sucesion/conmutador.py` | la conmutación en sí |
 | `estado/sintetico.py` | el estado mínimo: balances + tag de generación |
 | `nodo/pod.py` | aplica bloques, evalúa la regla, conmuta, reorganiza |
-| `pruebas/` | los 81 criterios, con el texto del criterio en el docstring |
+| `herramientas/convergencia.py` | cuatro nodos sin coordinarse, corriendo — el guion del video, paso 2 |
+| `pruebas/test_convergencia_entre_nodos.py` | cuatro nodos sin coordinarse convergen bit a bit; el que elige otro punto del espacio se desvía y se detecta con un hash |
+| `pruebas/` | los 107 criterios, con el texto del criterio en el docstring |
 
 **El caso del canario ya viene incluido**: `ReglaCanarioCriptografico` usa
 un nivel real de ML-DSA (44) como canario — no un valor inventado. El
@@ -76,7 +78,7 @@ un benchmark de confianza:
 cd predicado/vm
 cargo test --release                          # 20 criterios (C1-C7)
 cargo run --release --bin vectores verificar   # C3: 7 vectores bit-a-bit
-cargo run --release --bin bloque               # C1: 67 verificaciones como bloque
+cargo run --release --bin bloque               # C1: 15 verificaciones ML-DSA-44 como un bloque
 ```
 
 Dos techos de consenso, no uno: pasos **y** páginas de memoria distintas
@@ -109,8 +111,30 @@ paper, no una aserción escondida en un test. Arriba de eso, la línea
 conmutaciones: el objeto viejo sigue válido (I5) y el estado nunca se movió
 (I3) — es el mismo `id(nodo.estado)` de punta a punta.
 
+## Y cuatro nodos que no se hablan (`herramientas/convergencia.py`)
+
+Lo de arriba es **un** nodo conmutando, y eso no alcanza para lo único que un
+fork es: dos nodos que dejan de estar en la misma cadena.
+
+```
+python herramientas/convergencia.py
+```
+
+Cuatro nodos construidos por separado, cada uno produciendo sus propios
+bloques —sin red, sin gossip, sin compartir ni el objeto de la regla—, y la
+comparación hecha después desde afuera: el mismo `H0_B`, la misma altura de
+conmutación y las 181 cadenas de hashes coincidiendo bit a bit. No se pusieron
+de acuerdo; no hubo canal por donde ponerse de acuerdo.
+
+Después entra un quinto que eligió **otro punto legítimo del espacio** (parte
+la emisión en cuatro en vez de en dos, mismo disparo, misma altura): su `H0_B`
+es otro, y un hash alcanza para saber que se fue. Lo que conviene mirar es que
+**su linaje verifica contra sí mismo** — tiene que verificar, es la misma
+función de hash. Un desviado no se detecta porque `Verify` falle en el vacío,
+se detecta porque su `H0_B` no es el que Genesis determinó para esa generación.
+
 **Para ver esa misma corrida de un vistazo** (no una ilustración: son los
-datos reales que produjo la corrida de arriba):
+datos reales que produjo la corrida de `demo.py`):
 [geminis-succession-ihy4.vercel.app/timeline.html](https://geminis-succession-ihy4.vercel.app/timeline.html)
 — o abrí [`docs/timeline.html`](docs/timeline.html) local, es un archivo
 estático, sin servidor ni dependencias. Se regenera con
