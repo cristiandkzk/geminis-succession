@@ -1,6 +1,6 @@
 //! La maquina de §6.2 — Fase 4.
 //!
-//! **Acá cambia el lenguaje y es a proposito.** El resto de `genesis/` esta en
+//! **Acá cambia el lenguaje y es a proposito.** El resto de `geminis/` esta en
 //! Python porque lo que modela son reglas, y las reglas se leen. Esto no: esto es
 //! la pieza que I1 congela para siempre y la unica que corre codigo de terceros
 //! bajo presupuesto. Reutiliza el interprete RV32IM del arnes de Test 2, que ya

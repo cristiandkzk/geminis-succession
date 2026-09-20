@@ -2,7 +2,7 @@
 
 *[Leer esto en español](LEEME.md)*
 
-**The language changes here, on purpose.** The rest of `genesis/` is in Python because what it
+**The language changes here, on purpose.** The rest of `geminis/` is in Python because what it
 models are rules, and rules are meant to be read. This isn't: it's the piece I1 freezes forever,
 and the only one that runs third-party code under a budget.
 
@@ -52,7 +52,7 @@ the whole crate.
 cargo test --release              # the criteria that are properties
 cargo run --release --bin mezclas    # C7 — throughput by instruction mix
 cargo run --release --bin conjunto   # what it depends on: memory and text size
-cargo run --release --bin bloque     # C1 — 26 verifications as a block
+cargo run --release --bin bloque     # C1 — 15 ML-DSA-44 verifications as one block
 cargo run --release --bin vectores            # generates the C3 table
 cargo run --release --bin vectores verificar  # compares it against vectores.csv
 ```

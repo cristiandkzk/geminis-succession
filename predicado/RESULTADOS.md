@@ -398,7 +398,7 @@ frontera se movió.
 ## Cómo reproducir
 
 ```
-cd genesis/predicado/vm
+cd geminis/predicado/vm
 cargo test --release                 # C2, C4, C5, C6 y la regresión — 18 criterios
 cargo run --release --bin mezclas    # C7
 cargo run --release --bin conjunto   # de qué depende, y la curva de conjunto de trabajo

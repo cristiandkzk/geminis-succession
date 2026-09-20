@@ -2,7 +2,7 @@
 
 *[Read this in English](LEEME.en.md)*
 
-**Acá cambia el lenguaje y es a propósito.** El resto de `genesis/` está en Python porque lo que
+**Acá cambia el lenguaje y es a propósito.** El resto de `geminis/` está en Python porque lo que
 modela son reglas, y las reglas se leen. Esto no: es la pieza que I1 congela para siempre y la
 única que corre código de terceros bajo presupuesto.
 
@@ -52,7 +52,7 @@ literal decimal en todo el crate.
 cargo test --release              # los criterios que son propiedades
 cargo run --release --bin mezclas    # C7 — el ritmo por mezcla de instrucciones
 cargo run --release --bin conjunto   # de qué depende: memoria y tamaño de texto
-cargo run --release --bin bloque     # C1 — 26 verificaciones como un bloque
+cargo run --release --bin bloque     # C1 — 15 verificaciones ML-DSA-44 como un bloque
 cargo run --release --bin vectores            # genera la tabla de C3
 cargo run --release --bin vectores verificar  # la compara con vectores.csv
 ```
