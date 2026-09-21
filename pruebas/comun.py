@@ -6,8 +6,12 @@ from nodo.pod import NodoPoD
 from protocolo import genesis as g
 from sucesion.regla import ReglaCanarioCriptografico, ReglaEmisionAcumulada
 
-#: La transacción que gasta el canario de §6.6.
-GASTAR_CANARIO = ("gastar_canario",)
+#: Las transacciones que gastan el canario de §6.6: **firmas reales** de la instancia
+#: debilitada, obtenidas rompiéndola (~2^16 pasos). La k-ésima transición de la regla
+#: consume el k-ésimo canario, y por eso hay una constante por gasto: una firma que ya
+#: sirvió no gasta la siguiente.
+GASTAR_CANARIO = g.gasto_canario(0)
+GASTAR_CANARIO_2 = g.gasto_canario(1)
 
 
 def nodo_canario(**opciones) -> NodoPoD:

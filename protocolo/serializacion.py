@@ -29,6 +29,26 @@ from collections.abc import Mapping
 
 _PREFIJO = b"genesis/"
 
+#: Los hashes que la máquina de Genesis sabe calcular, por nombre de formato.
+#:
+#: El hash **es un formato más** —igual que `firma/ml-dsa-44`— y por eso sucede por
+#: la misma vía (I5: se agrega, no se quita). `HASH_GENESIS` es el del bloque 0 y **no
+#: figura en `formatos`**: agregarlo movería `H0_GENESIS`, que ya está publicado.
+HASH_SHA256 = "hash/sha256"
+HASH_KECCAK = "hash/sha3-256"
+HASH_GENESIS = HASH_SHA256
+
+#: El orden de sucesión: el hash vigente de un ruleset es el **último** de esta
+#: tupla que aparezca en sus `formatos`. Hace falta un orden porque `formatos` es un
+#: conjunto, y como los formatos sólo se agregan, el hash sólo puede avanzar.
+HASHES_EN_ORDEN = (HASH_SHA256, HASH_KECCAK)
+
+_HASHES = {HASH_SHA256: hashlib.sha256, HASH_KECCAK: hashlib.sha3_256}
+
+
+class HashDesconocido(ValueError):
+    """Se pidió un hash que la máquina de Genesis no conoce."""
+
 
 class FlotanteProhibido(TypeError):
     """Se intentó codificar un flotante. Ver el docstring del módulo."""
@@ -77,16 +97,40 @@ def codificar(valor: object) -> bytes:
     raise NoCodificable(f"sin codificación canónica para {type(valor).__name__}")
 
 
-def huella(valor: object, dominio: str) -> bytes:
-    """SHA-256 de `valor` bajo un dominio de separación.
+def hash_vigente(formatos: object) -> str:
+    """El hash que gobierna un ruleset con estos `formatos`. Sin formato de hash: el de Genesis."""
+    vigente = HASH_GENESIS
+    for nombre in HASHES_EN_ORDEN:
+        if nombre in formatos:
+            vigente = nombre
+    return vigente
+
+
+def huella(valor: object, dominio: str, hash_id: str = HASH_GENESIS) -> bytes:
+    """Hash de `valor` bajo un dominio de separación. Por defecto, SHA-256.
 
     El dominio evita que la imagen de un estado pueda hacerse pasar por la de un
     bloque o por la de un checkpoint generacional: son espacios distintos y no
     tienen por qué no colisionar por accidente.
+
+    `hash_id` elige la primitiva. **Quien llama no lo decide a su gusto**: sale del
+    ruleset vigente (`hash_vigente`), y para un checkpoint del linaje, del ruleset
+    *ancestro* — ver `protocolo/linaje.py`.
     """
-    return hashlib.sha256(
+    try:
+        funcion = _HASHES[hash_id]
+    except KeyError:
+        raise HashDesconocido(f"hash desconocido para la máquina: {hash_id!r}") from None
+    return funcion(
         _PREFIJO + dominio.encode("utf-8") + b"\x00" + codificar(valor)
     ).digest()
+
+
+def ceros_iniciales(digest: bytes) -> int:
+    """Cuántos bits en cero tiene el digest al comienzo. Es la 'dificultad' del canario de hash."""
+    total = len(digest) * 8
+    como_entero = int.from_bytes(digest, "big")
+    return total - como_entero.bit_length()
 
 
 def corto(h: bytes) -> str:

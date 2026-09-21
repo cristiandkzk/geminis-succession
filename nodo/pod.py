@@ -35,7 +35,7 @@ from protocolo import genesis as g
 from protocolo import invariantes
 from protocolo.generacion import Ruleset
 from protocolo.linaje import Checkpoint
-from protocolo.serializacion import huella
+from protocolo.serializacion import HASH_GENESIS, hash_vigente, huella
 from sucesion import distancia as distancia_mod
 from sucesion.conmutador import conmutar
 from sucesion.cronograma import Cronograma, Disparo
@@ -53,6 +53,10 @@ class Bloque:
     padre: bytes
     transacciones: tuple
     raiz_estado: bytes
+    #: Con qué hash se identifica este bloque: el del ruleset vigente en su altura. **No
+    #: entra en `canonico()`**: lo determina la cadena, y meterlo movería todo hash de
+    #: bloque ya publicado.
+    hash_id: str = HASH_GENESIS
 
     def canonico(self) -> dict:
         return {
@@ -63,7 +67,7 @@ class Bloque:
         }
 
     def hash(self) -> bytes:
-        return huella(self.canonico(), dominio="bloque")
+        return huella(self.canonico(), dominio="bloque", hash_id=self.hash_id)
 
 
 @dataclass
@@ -90,6 +94,7 @@ class NodoPoD:
         self.arranques = 1
         self.estado = estado if estado is not None else EstadoSintetico()
         self.ruleset = ruleset
+        self.estado.hash_id = hash_vigente(ruleset.formatos)
         self.ventana_finalidad = ventana_finalidad
         self.ventana_ritmo = ventana_ritmo
         self.revisar_invariantes = revisar_invariantes
@@ -107,6 +112,7 @@ class NodoPoD:
             padre=ruleset.h0,
             transacciones=(),
             raiz_estado=self.estado.huella(),
+            hash_id=self.estado.hash_id,
         )
         self.cadena: list[Bloque] = [bloque_cero]
         self.instantaneas: dict[int, dict] = {0: self.estado.instantanea()}
@@ -154,6 +160,10 @@ class NodoPoD:
         # 1 · activación: el ruleset nuevo gobierna el bloque entero.
         for checkpoint in self.cronograma.activaciones(altura):
             self.ruleset = conmutar(self.estado, self.ruleset, checkpoint)
+            # Después de conmutar y no antes: I3 compara la huella del estado antes y
+            # después **con la misma primitiva**, y lo que prueba es que el contenido
+            # cruzó intacto. Desde acá, todo hash del nodo es el del ruleset nuevo.
+            self.estado.hash_id = hash_vigente(self.ruleset.formatos)
             self.historial_rulesets.append((altura, self.ruleset))
             self.conmutaciones.append(
                 Conmutacion(altura, self.ruleset.generacion, self.estado.huella())
@@ -201,6 +211,7 @@ class NodoPoD:
             padre=self.cadena[-1].hash(),
             transacciones=tuple(transacciones),
             raiz_estado=raiz,
+            hash_id=self.estado.hash_id,
         )
         self.cadena.append(bloque)
 
@@ -288,6 +299,7 @@ class NodoPoD:
             (h, r) for h, r in self.historial_rulesets if h <= objetivo
         ]
         self.ruleset = self.historial_rulesets[-1][1]
+        self.estado.hash_id = hash_vigente(self.ruleset.formatos)
         self.conmutaciones = [c for c in self.conmutaciones if c.altura <= objetivo]
 
         for transacciones in bloques:

@@ -12,7 +12,7 @@ import unittest
 
 from protocolo import genesis as g
 from protocolo.linaje import calcular_h0, verificar, verificar_linaje
-from pruebas.comun import GASTAR_CANARIO, nodo_canario
+from pruebas.comun import GASTAR_CANARIO, GASTAR_CANARIO_2, nodo_canario
 
 
 def cadena_de_dos_generaciones():
@@ -20,7 +20,7 @@ def cadena_de_dos_generaciones():
     nodo.producir(2)
     nodo.producir_bloque([GASTAR_CANARIO])
     nodo.producir(20)
-    nodo.producir_bloque([GASTAR_CANARIO])
+    nodo.producir_bloque([GASTAR_CANARIO_2])
     nodo.producir(20)
     return nodo
 

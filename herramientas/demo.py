@@ -26,7 +26,8 @@ from sucesion.regla import (  # noqa: E402
     ReglaEmisionAcumulada,
 )
 
-GASTAR_CANARIO = ("gastar_canario",)
+#: La firma real que gasta el canario: rompe la instancia debilitada (~2^16 pasos).
+GASTAR_CANARIO = g.gasto_canario(0)
 #: A propósito **dentro** de la ventana de vuelo de la transición de
 #: circulación: es el caso que muestra la cola de activación.
 ALTURA_DEL_CANARIO = 130

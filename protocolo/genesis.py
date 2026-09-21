@@ -26,7 +26,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from protocolo.generacion import Params, Ruleset
-from protocolo.serializacion import huella
+from protocolo import canario
+from protocolo.serializacion import HASH_GENESIS, HASH_KECCAK, ceros_iniciales, huella
 
 # --------------------------------------------------------------------------- #
 # I1 · la máquina
@@ -187,6 +188,8 @@ FORMATOS_CONOCIDOS = frozenset(
         "firma/ed25519",
         "firma/ml-dsa-44",
         "recibo/gen0",
+        #: El hash sucesor, igual que la firma: ya está adentro desde el bloque 0.
+        HASH_KECCAK,
     }
 )
 
@@ -205,17 +208,61 @@ FORMATOS_CONOCIDOS = frozenset(
 #: criptográfico. Derivada, el único camino a producir el hecho es romper la
 #: primitiva, que es la capacidad ante la que la transición existe para reaccionar.
 #:
-#: En una cadena real la derivación produce la instancia debilitada de verdad
-#: (parámetros de curva, módulo, lo que corresponda) y hay que poder auditar que
-#: **nadie eligió el resultado**. Acá el hash hace de esa derivación: lo que la
-#: Fase 1 puede verificar es lo que un revisor verificaría en Genesis — que la
-#: instancia publicada es exactamente la que sale de la semilla.
+#: La derivación es real (`protocolo/canario.py`): de la semilla y del índice salen un
+#: grupo de Schnorr de 32 bits y una clave pública sin logaritmo conocido, y **gastar el
+#: canario es presentar una firma válida**, o sea haber roto la instancia. Lo que se
+#: audita en Genesis es que la publicada sea exactamente la que sale de la semilla.
 CANARIO_SEMILLA = (
     "genesis/canario/1 · instancia debilitada de firma/ed25519 · "
     "derivada, no generada · nadie retiene la trampa"
 )
 
-CANARIO_INSTANCIA = huella(CANARIO_SEMILLA, dominio="canario")
+#: El compromiso a la primera instancia (índice 0). Cada transición consume una
+#: instancia distinta —la k-ésima—, todas derivadas de la misma semilla.
+CANARIO_INSTANCIA = canario.compromiso(CANARIO_SEMILLA)
+
+
+def verifica_canario_firma(indice: int, e: int, s: int) -> bool:
+    """¿`(e, s)` gasta el canario de firma número `indice`? Sólo función de Genesis."""
+    return canario.verifica(CANARIO_SEMILLA, indice, e, s)
+
+
+def gasto_canario(indice: int = 0) -> tuple:
+    """La transacción que gasta el canario `indice`: lo que haría quien lo rompe."""
+    return canario.gasto(CANARIO_SEMILLA, indice)
+
+#: **El canario del hash.** Gemelo del de firma, y con la diferencia que importa: acá el
+#: gasto **se verifica**. Gastarlo exige una `solucion` tal que
+#: `H(semilla ‖ solucion)` empiece con `CANARIO_HASH_BITS` bits en cero, con `H` = el hash
+#: **de Genesis** (SHA-256), no el vigente: es el hash bajo amenaza el que se debilita.
+#:
+#: Sin trampa, por la misma razón que arriba: el problema sale de una semilla pública y
+#: no hay atajo que quien la fijó conozca; el único camino es trabajo de hash.
+#:
+#: **Lo que este canario mide y lo que no.** Mide *capacidad de cómputo*: cuánto hash
+#: puede hacer alguien. Una debilidad *estructural* de SHA-256 lo abarataría por debajo de
+#: `2^CANARIO_HASH_BITS`, pero desde afuera es indistinguible de más hardware. Detectar
+#: estructura exigiría una variante de menos rondas, que no existe en `hashlib`.
+#:
+#: **`CANARIO_HASH_BITS = 16` es un valor de demostración, no calibrado**: se resuelve en
+#: una fracción de segundo, para que las pruebas lo gasten de verdad. El real se calibra
+#: contra la capacidad de atacante que Genesis declare, igual que `Δ`, y es constante de
+#: Genesis por el mismo motivo que `CORTE_ARBOL`: dos nodos con otro valor divergen.
+CANARIO_HASH_SEMILLA = (
+    "genesis/canario/hash/1 · instancia debilitada de hash/sha256 · "
+    "derivada, no generada · nadie retiene la trampa"
+)
+CANARIO_HASH_BITS = 16
+
+
+def resuelve_canario_hash(solucion: bytes) -> bool:
+    """¿`solucion` gasta el canario de hash? Determinístico y sólo función de Genesis."""
+    digest = huella(
+        {"semilla": CANARIO_HASH_SEMILLA, "solucion": solucion},
+        dominio="canario/hash",
+        hash_id=HASH_GENESIS,
+    )
+    return ceros_iniciales(digest) >= CANARIO_HASH_BITS
 
 # --------------------------------------------------------------------------- #
 # Los tres tiempos (§3)

@@ -24,11 +24,24 @@ from dataclasses import dataclass
 from typing import Sequence
 
 from protocolo.generacion import Params
-from protocolo.serializacion import corto, huella
+from protocolo.serializacion import HASH_GENESIS, corto, hash_vigente, huella
 
 
-def calcular_h0(h0_ancestro: bytes, state_trigger: bytes, params: Params) -> bytes:
+def calcular_h0(
+    h0_ancestro: bytes,
+    state_trigger: bytes,
+    params: Params,
+    hash_id: str = HASH_GENESIS,
+) -> bytes:
     """`H( H0_A ‖ state_trigger ‖ params_nuevos )`.
+
+    **`hash_id` es el hash del ruleset ancestro, no el de `params`.** Es lo único
+    que verifica desde A: Genesis A conoce su propia primitiva y nada más, y la
+    verificabilidad del linaje "con un hash desde cualquier generación hacia atrás"
+    depende de eso. Si `H0_B` se calculara con el hash que B *introduce*, verificar
+    la transición exigiría ya confiar en la primitiva nueva. Cuando `params` agrega
+    `hash/sha3-256`, el checkpoint que la introduce todavía sale de SHA-256; el
+    siguiente ya sale de Keccak.
 
     La concatenación del paper se realiza como un mapa de tres claves fijas: la
     codificación canónica es autodelimitada, así que no hay forma de que un
@@ -41,14 +54,23 @@ def calcular_h0(h0_ancestro: bytes, state_trigger: bytes, params: Params) -> byt
             "params": params.canonico(),
         },
         dominio="linaje/checkpoint",
+        hash_id=hash_id,
     )
 
 
 def verificar(
-    h0_b: bytes, h0_a: bytes, state_trigger: bytes, params: Params
+    h0_b: bytes,
+    h0_a: bytes,
+    state_trigger: bytes,
+    params: Params,
+    hash_id: str = HASH_GENESIS,
 ) -> bool:
-    """`Verify( H0_B, H0_A, state_trigger, params_nuevos )` del §3."""
-    return h0_b == calcular_h0(h0_a, state_trigger, params)
+    """`Verify( H0_B, H0_A, state_trigger, params_nuevos )` del §3.
+
+    `hash_id` es el hash del ruleset A (ver `calcular_h0`). El default es el de
+    Genesis, que es lo correcto para la primera transición de toda cadena.
+    """
+    return h0_b == calcular_h0(h0_a, state_trigger, params, hash_id)
 
 
 @dataclass(frozen=True)
@@ -87,8 +109,11 @@ class Checkpoint:
             "altura_activacion": self.altura_activacion,
         }
 
-    def es_valido(self) -> bool:
-        return verificar(self.h0, self.h0_ancestro, self.state_trigger, self.params)
+    def es_valido(self, hash_id: str = HASH_GENESIS) -> bool:
+        """`hash_id` es el del ancestro; `motivo_linaje_invalido` lo va siguiendo."""
+        return verificar(
+            self.h0, self.h0_ancestro, self.state_trigger, self.params, hash_id
+        )
 
 
 def motivo_linaje_invalido(
@@ -104,6 +129,9 @@ def motivo_linaje_invalido(
     """
     esperado_ancestro = h0_raiz
     esperada_generacion = 1
+    # El hash con que se calculó cada checkpoint es el del ancestro: se arranca en el
+    # de Genesis y se avanza con los `params` de cada eslabón ya verificado.
+    hash_del_ancestro = HASH_GENESIS
 
     for indice, punto in enumerate(checkpoints):
         if punto.h0_ancestro != esperado_ancestro:
@@ -117,13 +145,14 @@ def motivo_linaje_invalido(
                 f"checkpoint #{indice} dice ser la generación {punto.generacion} "
                 f"y le toca la {esperada_generacion}"
             )
-        if not punto.es_valido():
+        if not punto.es_valido(hash_del_ancestro):
             return (
                 f"checkpoint #{indice} (generación {punto.generacion}): el hash no "
-                "se deriva de (ancestro || state_trigger || params)"
+                f"se deriva de (ancestro || state_trigger || params) con {hash_del_ancestro}"
             )
         esperado_ancestro = punto.h0
         esperada_generacion += 1
+        hash_del_ancestro = hash_vigente(punto.params.formatos)
 
     return None
 

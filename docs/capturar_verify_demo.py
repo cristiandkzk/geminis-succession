@@ -24,7 +24,8 @@ from sucesion.regla import (  # noqa: E402
     ReglaEmisionAcumulada,
 )
 
-GASTAR_CANARIO = ("gastar_canario",)
+#: La firma real que gasta el canario: rompe la instancia debilitada (~2^16 pasos).
+GASTAR_CANARIO = g.gasto_canario(0)
 ALTURA_DEL_CANARIO = 130
 BLOQUES = 260
 CERO_32 = b"\x00" * 32

@@ -17,7 +17,13 @@ import unittest
 from nodo.pod import ReorganizacionProfunda
 from protocolo import genesis as g
 from protocolo.generacion import FormatoDesconocido, Objeto, decodificar
-from pruebas.comun import GASTAR_CANARIO, correr_hasta_activar, nodo_canario, nodo_emision
+from pruebas.comun import (
+    GASTAR_CANARIO,
+    GASTAR_CANARIO_2,
+    correr_hasta_activar,
+    nodo_canario,
+    nodo_emision,
+)
 
 
 class ElEstadoCruzaIntacto(unittest.TestCase):
@@ -71,7 +77,7 @@ class ElLinajeVerifica(unittest.TestCase):
         nodo.producir(2)
         nodo.producir_bloque([GASTAR_CANARIO])  # disparo en 3
         nodo.producir(20)
-        nodo.producir_bloque([GASTAR_CANARIO])  # segundo disparo
+        nodo.producir_bloque([GASTAR_CANARIO_2])  # segundo disparo: el canario 1
         nodo.producir(20)
 
         self.assertGreaterEqual(len(nodo.cronograma.checkpoints), 2)
@@ -230,7 +236,7 @@ class ElNodoNoSeReinicia(unittest.TestCase):
         nodo.producir_bloque([GASTAR_CANARIO])
         nodo.producir(3)
         nodo.reorganizar(6, bloques=[(), ()])
-        correr_hasta_activar(nodo, {nodo.altura + 1: GASTAR_CANARIO})
+        correr_hasta_activar(nodo, {nodo.altura + 1: GASTAR_CANARIO_2})
 
         self.assertEqual(nodo.generacion, 1)
         self.assertEqual(nodo.arranques, 1)

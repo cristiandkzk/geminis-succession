@@ -25,8 +25,9 @@ import copy
 from dataclasses import dataclass, field
 from typing import Any
 
+from protocolo import genesis as g
 from protocolo.generacion import Objeto, Ruleset
-from protocolo.serializacion import huella
+from protocolo.serializacion import HASH_GENESIS, huella
 
 RESERVA = "reserva"
 
@@ -48,6 +49,8 @@ class EstadoSintetico:
     emitido: int = 0
     quemado: int = 0
     canarios_gastados: int = 0
+    #: El canario de hash (`g.resuelve_canario_hash`): 0 o 1, se gasta una sola vez.
+    canarios_hash_gastados: int = 0
     saldos: dict[str, int] = field(default_factory=lambda: {RESERVA: 0})
     objetos: dict[str, Objeto] = field(default_factory=dict)
     #: Publicadas por el nodo en cada bloque (I2). Clave: nombre de la regla.
@@ -63,12 +66,17 @@ class EstadoSintetico:
     #: los mismos pedidos computan el mismo veredicto, y si uno computara otro la
     #: raíz no cerraría y su bloque se rechazaría. Ahí está la propiedad.
     maquina: Any = None
+    #: **Tampoco es estado de consenso: es una consecuencia del ruleset vigente.** Lo fija
+    #: el nodo con `hash_vigente(ruleset.formatos)` en el bloque 0, en cada activación y
+    #: al reorganizar. No entra en `canonico()` porque ya está determinado por lo que sí
+    #: entra (los `eventos` de lock-in llevan los `formatos`).
+    hash_id: str = HASH_GENESIS
     pedidos: dict[bytes, Any] = field(default_factory=dict, repr=False)
 
     # -- huella ------------------------------------------------------------ #
 
     def canonico(self) -> dict:
-        return {
+        forma = {
             "altura": self.altura,
             "emitido": self.emitido,
             "quemado": self.quemado,
@@ -80,9 +88,15 @@ class EstadoSintetico:
             },
             "eventos": list(self.eventos),
         }
+        # Un campo en su valor por defecto no se codifica. Así una cadena que nunca
+        # tocó el canario de hash tiene **la misma huella que antes de que existiera**:
+        # lo que ya se publicó sigue verificando.
+        if self.canarios_hash_gastados:
+            forma["canarios_hash_gastados"] = self.canarios_hash_gastados
+        return forma
 
     def huella(self) -> bytes:
-        return huella(self.canonico(), dominio="estado/sintetico")
+        return huella(self.canonico(), dominio="estado/sintetico", hash_id=self.hash_id)
 
     # -- transiciones de estado -------------------------------------------- #
 
@@ -104,11 +118,42 @@ class EstadoSintetico:
         elif operacion == "crear_objeto":
             self._crear_objeto(*argumentos, ruleset=ruleset)
         elif operacion == "gastar_canario":
-            self.canarios_gastados += 1
+            self._gastar_canario(*argumentos)
+        elif operacion == "gastar_canario_hash":
+            self._gastar_canario_hash(*argumentos)
         elif operacion == "evaluar":
             self._evaluar(*argumentos, ruleset=ruleset)
         else:
             raise OperacionInvalida(f"operación desconocida: {operacion!r}")
+
+    def _gastar_canario(self, *prueba: int) -> None:
+        """Gasta el canario de firma número `canarios_gastados` **si y sólo si** la prueba vale.
+
+        La prueba es una firma `(e, s)` de la instancia debilitada de ese índice
+        (`protocolo/canario.py`). Producirla sin la clave es resolver un logaritmo discreto,
+        y por eso gastarlo demuestra capacidad. Consume **una instancia por transición**:
+        una firma que ya sirvió no gasta la siguiente.
+        """
+        if len(prueba) != 2:
+            raise OperacionInvalida("gastar_canario lleva la firma (e, s) del canario")
+        if not g.verifica_canario_firma(self.canarios_gastados, *prueba):
+            raise OperacionInvalida(
+                f"la firma no gasta el canario {self.canarios_gastados}: no rompe su instancia"
+            )
+        self.canarios_gastados += 1
+
+    def _gastar_canario_hash(self, solucion: bytes) -> None:
+        """Gasta el canario de hash **si y sólo si** `solucion` resuelve el problema.
+
+        A diferencia del canario de firma —un contador que cualquiera incrementa—, acá
+        el hecho que dispara la transición es *haber hecho el trabajo*: es lo que hace
+        que "capacidad demostrada" sea una demostración y no una compuerta.
+        """
+        if self.canarios_hash_gastados:
+            raise OperacionInvalida("el canario de hash ya se gastó")
+        if not g.resuelve_canario_hash(solucion):
+            raise OperacionInvalida("la solución no resuelve el canario de hash")
+        self.canarios_hash_gastados += 1
 
     def _transferir(self, origen: str, destino: str, monto: int, *, ruleset: Ruleset) -> None:
         if monto < 0:
@@ -157,6 +202,7 @@ class EstadoSintetico:
                 "emitido": self.emitido,
                 "quemado": self.quemado,
                 "canarios_gastados": self.canarios_gastados,
+                "canarios_hash_gastados": self.canarios_hash_gastados,
                 "saldos": self.saldos,
                 "objetos": self.objetos,
                 "distancias": self.distancias,
@@ -176,6 +222,7 @@ class EstadoSintetico:
         self.emitido = copia["emitido"]
         self.quemado = copia["quemado"]
         self.canarios_gastados = copia["canarios_gastados"]
+        self.canarios_hash_gastados = copia["canarios_hash_gastados"]
         self.saldos = copia["saldos"]
         self.objetos = copia["objetos"]
         self.distancias = copia["distancias"]
@@ -203,6 +250,6 @@ class EstadoSintetico:
         en el lock-in y tiene que salir del estado del bloque `N`, no del de `F`
         bloques después.
         """
-        copia = EstadoSintetico()
+        copia = EstadoSintetico(hash_id=self.hash_id)
         copia.restaurar(self.instantanea())
         return copia

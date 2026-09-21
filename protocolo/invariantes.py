@@ -26,6 +26,7 @@ import inspect
 from typing import Any, Protocol, Sequence, runtime_checkable
 
 from protocolo import genesis as g
+from protocolo.canario import compromiso
 from protocolo.generacion import Objeto, Params, Ruleset, es_aditivo, formatos_retirados
 from protocolo.linaje import Checkpoint, motivo_linaje_invalido
 from protocolo.serializacion import corto, huella
@@ -230,7 +231,7 @@ def i2_canario_sin_trampa(semilla: str, instancia: bytes) -> None:
     para ser una compuerta con disfraz criptográfico: exactamente la gobernanza
     que I2 existe para eliminar, sólo que más difícil de ver.
     """
-    esperada = huella(semilla, dominio="canario")
+    esperada = compromiso(semilla)
     if instancia != esperada:
         raise ViolacionInvariante(
             "I2",
