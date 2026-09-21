@@ -16,7 +16,7 @@ corriendo.
 `Verify()` pasar de `True` a `False`.
 
 ```
-python verificar.py       # las 107 pruebas de este recorte
+python verificar.py       # las 142 pruebas de este recorte
 python verificar.py -v    # con el nombre de cada criterio
 ```
 
@@ -53,16 +53,21 @@ Geminis (`geminis/` en el repo completo), portadas tal cual:
 | `nodo/pod.py` | aplica bloques, evalúa la regla, conmuta, reorganiza |
 | `herramientas/convergencia.py` | cuatro nodos sin coordinarse, corriendo — el guion del video, paso 2 |
 | `pruebas/test_convergencia_entre_nodos.py` | cuatro nodos sin coordinarse convergen bit a bit; el que elige otro punto del espacio se desvía y se detecta con un hash |
-| `pruebas/` | los 107 criterios, con el texto del criterio en el docstring |
+| `pruebas/` | los 142 criterios, con el texto del criterio en el docstring |
 
-**El caso del canario ya viene incluido**: `ReglaCanarioCriptografico` usa
-un nivel real de ML-DSA (44) como canario — no un valor inventado. El
-formato sucesor es un parámetro configurable de la regla; en esta corrida
-usa el mismo nombre por default, como el resto de los parámetros del
-recorte (desechables por declaración). El canario se deriva de una semilla
-pública
-(`g.CANARIO_SEMILLA`) y el nodo lo verifica en cada bloque: una instancia que
-no sale de esa semilla no pasa (`pruebas/test_i2_quien_elige_el_momento.py`).
+**El caso del canario ya viene incluido**: `ReglaCanarioCriptografico` dispara
+cuando se **gasta un canario**, y gastarlo exige una firma Schnorr válida de una
+instancia debilitada (un grupo de 32 bits) derivada de una semilla pública
+(`g.CANARIO_SEMILLA`). Nadie retiene la clave: producir la firma es resolver un
+logaritmo discreto, ~2^16 pasos (`protocolo/canario.py`,
+`pruebas/test_canario_de_firma.py`). Cada transición consume un canario distinto,
+así que una firma que ya sirvió no dispara la siguiente. **Lo que mide y lo que
+no:** capacidad de cómputo demostrada sobre una instancia de demostración (32
+bits, sin calibrar), no una rotura de ed25519 ni de ML-DSA. La transición agrega
+el formato sucesor (`firma/ml-dsa-44`, parámetro configurable de la regla) a los
+formatos aceptados; en este recorte es una etiqueta, y la verificación real de
+ML-DSA-44 vive en la VM (`predicado/vm/`). El nodo verifica en cada bloque que la
+instancia salga de la semilla (`pruebas/test_i2_quien_elige_el_momento.py`).
 
 ## La máquina que ejecuta el switch (`predicado/vm/`, Rust)
 

@@ -16,7 +16,7 @@ running.
 `Verify()` flip from `True` to `False`.
 
 ```
-python verificar.py       # the 107 tests in this slice
+python verificar.py       # the 142 tests in this slice
 python verificar.py -v    # with each criterion's name
 ```
 
@@ -53,15 +53,22 @@ This slice is **Phase 0 and Phase 1** of Geminis's reference implementation
 | `nodo/pod.py` | applies blocks, evaluates the rule, switches, reorganizes |
 | `herramientas/convergencia.py` | four nodes that never coordinate, running — step 2 of the video script |
 | `pruebas/test_convergencia_entre_nodos.py` | four nodes that never coordinate converge bit for bit; the one that picks a different point of the space diverges and is caught with one hash |
-| `pruebas/` | the 107 criteria, with the criterion's text in the docstring |
+| `pruebas/` | the 142 criteria, with the criterion's text in the docstring |
 
-**The canary case is already included**: `ReglaCanarioCriptografico` uses a
-real ML-DSA level (44) as the canary — not an invented value. The successor
-format is a configurable parameter of the rule; this run uses the same name
-by default, like the rest of the slice's parameters (disposable by
-declaration). The canary is derived from a public seed (`g.CANARIO_SEMILLA`)
-and the node verifies it on every block: an instance that doesn't come from
-that seed doesn't pass (`pruebas/test_i2_quien_elige_el_momento.py`).
+**The canary case is already included**: `ReglaCanarioCriptografico` fires when
+a **canary is spent**, and spending it requires a valid Schnorr signature of a
+deliberately weakened instance (a 32-bit group) derived from a public seed
+(`g.CANARIO_SEMILLA`). Nobody holds the key: producing the signature means
+solving a discrete logarithm, ~2^16 steps (`protocolo/canario.py`,
+`pruebas/test_canario_de_firma.py`). Each transition consumes a different
+canary, so a signature that already worked does not fire the next one. **What it
+measures and what it doesn't:** demonstrated compute capacity against a
+demonstration instance (32 bits, uncalibrated), not a break of ed25519 or
+ML-DSA. The transition adds the successor format (`firma/ml-dsa-44`, a
+configurable parameter of the rule) to the accepted formats; in this slice it is
+a label, and the real ML-DSA-44 verification lives in the VM (`predicado/vm/`).
+The node checks on every block that the instance comes from the seed
+(`pruebas/test_i2_quien_elige_el_momento.py`).
 
 ## The machine that executes the switch (`predicado/vm/`, Rust)
 
